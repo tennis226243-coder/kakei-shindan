@@ -280,6 +280,8 @@ body.setup .view{padding-top:12px!important}
   <div class="group" id="nowMetrics" style="margin-top:8px"></div>
   <div class="gh">見直すなら</div>
   <div class="group" id="advice"></div>
+  <div class="gh">これからの収入と支出の合計</div>
+  <div class="group" id="dTotals"></div>
   <div class="gh">支出を同じ年収の世帯と比べる</div>
   <div class="group" id="cmpBox"></div>
   <p class="gf" id="cmpNote"></p>
@@ -355,7 +357,7 @@ body.setup .view{padding-top:12px!important}
    <li><b>退職後の生活費</b>＝退職直前の基本生活費×「退職後の生活費」（初期値88%）×年齢係数（65〜69歳1.000・70〜74歳0.962・75歳以上0.837）</li>
    <li><b>貯蓄</b>＝収入−支出。余りは翌年の預貯金に繰り越し、積立額は投資へ。足りない年は投資から取り崩します</li>
    <li><b>運用</b>：株式・投資信託は毎月の積立を月複利で運用。NISAの上限を超える部分の運用益には20.315%の税金。iDeCoは厚生労働省の公的年金シミュレーターと同じ方法</li>
-   <li><b>年金</b>＝基礎年金（2026年度満額 年84.73万円 ×（480か月−学生納付特例で追納していない月数）÷480）＋厚生年金（平均年収÷12×5.481/1000×加入月数）。60歳以降も会社員として働く期間は「経過的加算」として基礎年金と同じ単価で上乗せ（厚生年金の加入は480か月まで）。受け取り開始が65歳より早いと1か月0.4%減、遅いと0.7%増。条件を満たせば加給年金</li>
+   <li><b>年金</b>＝基礎年金（手取りは1人あたりの年金額に応じて額面の95%・90%・86%）（2026年度満額 年84.73万円 ×（480か月−学生納付特例で追納していない月数）÷480）＋厚生年金（平均年収÷12×5.481/1000×加入月数）。60歳以降も会社員として働く期間は「経過的加算」として基礎年金と同じ単価で上乗せ（厚生年金の加入は480か月まで）。受け取り開始が65歳より早いと1か月0.4%減、遅いと0.7%増。条件を満たせば加給年金</li>
    <li><b>教育費</b>：文部科学省「子供の学習費調査（令和5年度）」、私立大学の学生納付金調査（令和7年度）、国立大学の標準額。高校は2026年4月からの就学支援金を反映</li>
    <li><b>90歳まで資金が持つ確率</b>：運用利回りに毎年ランダムなブレ（標準偏差12%）を加えて200回試算し、資産が一度も0を下回らなかった割合</li>
    <li><b>家計の余裕／必要な節約</b>：基本生活費を月いくら増減すれば、90歳まで資産が生活費6か月分を下回らないかを二分探索で求めます</li>
@@ -408,6 +410,8 @@ body.setup .view{padding-top:12px!important}
   <div class="pbox" id="sCmpBox"></div>
   <h2><span class="tag">WHAT IF</span>もしもの比較</h2>
   <div class="pbox"><div id="sScenBox" class="stgtip" style="margin:0">今の計画と「もしも」を並べて比べるよ。</div><button type="button" class="pbtn alt" data-scen="1" style="margin:10px 0 0;width:100%">もしもの比較を表示 ▾</button></div>
+  <h2><span class="tag">TOTAL</span>これからのお金の合計</h2>
+  <div class="pbox" id="sTotals"></div>
   <h2><span class="tag">STAGE</span>年代ごとのステージ</h2>
   <div class="stages" id="sStages"></div>
   <p class="pnote" style="margin:-4px 20px 8px">★★★ すべて良好<br>★★☆ 注意したい点あり（貯蓄率の低下・預貯金が少ない時期など）<br>★☆☆ この年代にお金が底をつく</p>
@@ -451,7 +455,7 @@ body.setup .view{padding-top:12px!important}
   <div class="group kpi" id="aFlowKpi"></div>
   <div class="group" id="aFlowTotal" style="margin-top:8px"></div>
   <div class="group" style="margin-top:8px"><div style="overflow-x:auto;max-height:380px;overflow-y:auto"><table class="audit" id="aFlow"></table></div></div>
-  <p class="gf">年収は昇給の予定から予想した額面。収入は手取り＋児童手当＋配偶者の手取り＋年金など。年間支出は生活費・教育費・ローン返済・イベント・一括購入の合計（積立投資は含みません）。差額＝収入−年間支出で、この分が貯蓄（積立を含む）に回ります。合計は将来のお金の額面（物価上昇込み）で、退職金・iDeCoの受け取りも収入に含みます。</p>
+  <p class="gf">年収は昇給の予定から予想した額面。収入は手取り＋児童手当＋配偶者の手取り＋年金など。年間支出は生活費・教育費・ローン返済・イベント・一括購入の合計（積立投資は含みません）。差額＝収入−年間支出で、この分が貯蓄（積立を含む）に回ります。表の各年は将来のお金の額面（物価上昇込み）、上の合計は今の価値です。</p>
   <div class="gh">年末の実績の推移</div>
   <div class="group" style="margin-bottom:8px"><div class="row tap" role="button" tabindex="0" id="toActuals">📝 源泉徴収票から年末の実績を入力・予想と比較する</div></div>
   <div class="group"><div class="chart" id="aChart"></div><div class="legend"><span><i style="background:var(--tint)"></i>金融資産</span><span><i style="background:var(--red)"></i>ローン残高</span><span><i style="background:var(--green)"></i>純資産</span></div></div>
@@ -697,6 +701,9 @@ function wcv(name,a){const c=WCURVES[name];if(!c)return 1;if(a<=WC_AGES[0])retur
 // 同じ年収の世帯の支出（総務省「令和6年全国家計構造調査」総世帯のうち勤労者世帯・年間収入五分位）
 const QB=[351,510,689,932],QTOT=[165114,207531,243788,294984,402639],QPERS=[1.29,1.67,2.26,2.76,3.19];
 const QSH={food:[19.9+5.6,20.0+6.8,21.3+6.9,21.6+6.7,19.4+6.9],house:[18.2,14.8,11.6,8.1,7.1],util:[7.9,7.1,7.1,7.0,5.8],misc:[3.2+2.9,3.5+3.0,3.7+3.3,4.0+3.7,3.8+4.1],trans:[14.9,15.9,16.0,15.0,14.6],edu:[0.8,1.3,2.4,4.2,6.8],other:[4.4+10.3+9.2+2.7,4.6+10.0+9.8+3.1,4.4+9.4+10.8+3.1,4.4+10.0+12.5+3.0,4.0+10.6+14.2+2.8]};
+// 年金の手取り：年金からは所得税・住民税・国民健康保険料・介護保険料が引かれる。1人あたりの年金額（今の価値）が
+// 年150万円以下なら95%、250万円以下なら90%、それを超えると86%を手取りの目安にする（一般に額面の85〜95%）
+function pensNet(a,pg){if(!(a>0))return 0;const t=a/(pg||1);return a*(t<=150?0.95:t<=250?0.90:0.86)}
 function eldIdx(a){return a<70?1:a<75?0.962:0.837}
 // 年代別の黒字率（参考）：総務省「家計調査2025」二人以上の世帯のうち勤労者世帯（黒字＝可処分所得−消費支出。住宅ローンの元本返済も含む）
 const KOKU={20:44.4,30:44.4,40:38.9,50:34.2,60:22.4};
@@ -726,7 +733,7 @@ function loanModel(L){
     startYear:Math.ceil((off+1)/12),endYear:Math.ceil((off+n)/12)};
 }
 
-let B0_INFO=null,PLAN_M=null,NOW_FLOW=null,LAST=null,TL=[],tlMode="big",decOpen=null;
+let TOT_NOTE=null,B0_INFO=null,PLAN_M=null,NOW_FLOW=null,LAST=null,TL=[],tlMode="big",decOpen=null;
 function ageFrom(b,frac){if(!b)return null;const d=new Date(b+"T00:00:00");if(isNaN(d))return null;const n=new Date();
   if(frac)return Math.round((n-d)/(365.2425*864e5)*10)/10;let a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a}
 function applyBirthdays(){const a=ageFrom(S.v.myBirth);if(a!=null)S.v.age=String(a);const w=ageFrom(S.v.spBirth);if(w!=null)S.v.wAge=String(w);
@@ -880,9 +887,9 @@ function calc(){
       else if(age>=v.pensionAge)pens+=pensY*pg;
       if(v.diMonthly>0&&age<=v.diUntil)inc+=v.diMonthly*12}
     else if(age>=v.pensionAge){pens+=pensY*pg;if(Math.round(age)===Math.round(v.pensionAge))add(age,`あなたの年金 受け取り開始（月${r1(v.pension*pg)}万円）`,pensY*pg,true)}
-    if(wAge>=v.wPensionAge){pens+=wPensY*pg;if(Math.round(wAge)===Math.round(v.wPensionAge))add(age,`配偶者の年金 受け取り開始（配偶者${Math.round(wAge)}歳・月${r1(v.wPension*pg)}万円）`,wPensY*pg,true)}
+    let pW=0;if(wAge>=v.wPensionAge){pW+=wPensY*pg;if(Math.round(wAge)===Math.round(v.wPensionAge))add(age,`配偶者の年金 受け取り開始（配偶者${Math.round(wAge)}歳・月${r1(v.wPension*pg)}万円）`,wPensY*pg,true)}
     if(PEN.kakyu&&v.pensionAuto&&age>=v.pensionAge&&wAge<65)pens+=PEN.kakyu*pg;
-    inc+=pens*.95;
+    const pensNetY=pensNet(pens,pg)+pensNet(pW,pg);inc+=pensNetY;
     const idePay=dcY.pay;inc+=idePay;
     if(Math.round(age)===Math.round(v.dcStart)&&idePay>0)add(age,v.dcMethod==="一時金"?"iDeCo 一時金で受け取り":`iDeCo 年金で受け取り開始（月${r1(idePay/12)}万円・${v.dcYears}年間）`,idePay,true); // 年金にかかる税・社会保険料をおおまかに差し引き
     // 配偶者
@@ -950,7 +957,7 @@ function calc(){
     const tot=cash+invA+dcA;
     if(tot<0&&shortAge===null){shortAge=age;add(age,"世帯の資産が底をつく",0,true)}
     if(tot>peak.val)peak={age,val:tot};
-    rows.push({age,fin:tot,cash,debt:bal+loanBalAll(y*12),wife:wA,kids:kf.slice(),ev:yr,cash0,contribY:contrib,sal,wInc,inc,netW,grossY,ifr,inv0,invC,invGain,invDraw,save:ifr!=null?ifr-(exp-contrib)+kidSaved-kidSaved:null,kd:kidDeltaY,lp,invA,pens:pens*.95,ide:idePay,spend:exp-contrib,gain});
+    rows.push({age,fin:tot,cash,debt:bal+loanBalAll(y*12),wife:wA,kids:kf.slice(),ev:yr,cash0,contribY:contrib,sal,wInc,inc,netW,grossY,ifr,inv0,invC,invGain,invDraw,save:ifr!=null?ifr-(exp-contrib)+kidSaved-kidSaved:null,kd:kidDeltaY,lp,invA,pens:pensNetY,ide:idePay,spend:exp-contrib,gain});
   }
   return{rows,shortAge,peak,acc};};
   const SM=sim(0,0,"mid",true),SL=sim(-2,-1,"low",false),SH=sim(2,1,"high",false);
@@ -1116,6 +1123,15 @@ function calc(){
    CMP_HTML.d=html;CMP_HTML.note=note;
    const top=rowsC.map(r=>({n:r[0],d:r[1]-r[2]})).sort((a,b)=>b.d-a.d)[0];
    CMP_HTML.sum=`<div class="stgtip" style="margin:0 0 6px">${top&&top.d>0.5?`いちばん多めなのは <b>${top.n}</b>（月${r1(top.d)}万円多い）だよ。`:"どのカテゴリーも同じ年収の家庭と同じくらいか少なめだよ！"}</div>`;CMP_HTML.s=rowsC.map(([n,m,t])=>{const pc=t>0?(m-t)/t*100:0;const w=Math.min(100,m/Math.max(t,m,0.1)*100),w2=Math.min(100,t/Math.max(t,m,0.1)*100);return `<div class="stat"><div class="top"><span>${n}</span><em style="color:${pc>5?"#E0356F":pc<-5?"#23A04A":"inherit"}">${pc>=0?"+":""}${Math.round(pc)}%</em></div><div class="bar" style="height:10px"><i style="width:${w}%;--c:var(--pink)"></i></div><div class="bar" style="height:10px;margin-top:3px"><i style="width:${w2}%;--c:var(--cyan)"></i></div><small>あなた 月${r1(m)}万（ピンク）／同じ年収の家庭 月${r1(t)}万（水色）</small></div>`}).join("")+`<p class="pnote" style="margin:6px 0 0">${note}</p>`;renderCmp()}
+  {const fl=rows.slice(1),ret=v.retireAge,dv=x=>Math.pow(1+v.infl/100,x.age-v.age),wk=fl.filter(x=>x.age<=ret),rt=fl.filter(x=>x.age>ret);
+   // 収入から iDeCo の受け取り（自分で積み立てたお金の取り崩し）を除き、今の価値に直して合計
+   const sI=a=>a.reduce((t,x)=>t+(x.inc-(x.ide||0))/dv(x),0),sE=a=>a.reduce((t,x)=>t+x.spend/dv(x),0),sD=a=>a.reduce((t,x)=>t+(x.ide||0)/dv(x),0),sP=a=>a.reduce((t,x)=>t+(x.pens||0)/dv(x),0);
+   const T=[[`今から${END_AGE}歳まで`,sI(fl),sE(fl)],[`働いている間（〜${Math.round(ret)}歳）`,sI(wk),sE(wk)],[`退職後（${Math.round(ret)+1}〜${END_AGE}歳）`,sI(rt),sE(rt)]];
+   const ideT=sD(fl),pR=sP(rt),yrs=Math.max(1,rt.length);
+   const note=`今の価値（物価上昇を除いた金額）。退職後の収入はほぼ年金で、手取りで年平均${fmt(pR/yrs)}（月${r1(pR/yrs/12)}万円）。iDeCoの受け取り（${fmt(ideT)}）は自分で積み立てたお金の取り崩しなので、収入に含めていません。支出に積立投資は含みません。`;
+   const dt=document.getElementById("dTotals");if(dt)dt.innerHTML=T.map(([t,i,e],k)=>`<div class="row"><div class="lbl">${k?t:"<b>"+t+"</b>"}<small>収入 ${fmt(i)}／支出 ${fmt(e)}</small></div><div class="val" style="color:${i-e<0?"var(--red)":"var(--green)"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</div></div>`).join("")+`<div class="row"><div class="lbl"><small>${note}</small></div></div>`;
+   const st=document.getElementById("sTotals");if(st)st.innerHTML=T.map(([t,i,e])=>`<div class="stat"><div class="top"><span>${t}</span><em style="color:${i-e<0?"#E0356F":"#23A04A"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</em></div><small>入ってくるお金 ${fmt(i)}／出ていくお金 ${fmt(e)}</small></div>`).join("")+`<p class="pnote" style="margin:6px 0 0">${note}</p>`;
+   TOT_NOTE={T,note};}
   try{renderSimple({level,rate,emerg,houseRatio,fin,v,shortAge,rows,DEC,A,net,reqRate,reqRows})}catch(e){console.error(e)}
 }
 /* ===== かんたん版の描画 ===== */
@@ -1251,10 +1267,7 @@ function renderAssets(){{const t=document.getElementById("toActuals");if(t&&!t.d
   // 年間の収支
   {const rows=(CH.chart&&CH.chart.rows)||[],Y=new Date().getFullYear(),a0=num(S.v.age);
    if(NOW_FLOW){const d=NOW_FLOW.net-NOW_FLOW.spend;document.getElementById("aFlowKpi").innerHTML=`<div><b>${fmt(NOW_FLOW.net)}</b><span>今年の収入</span></div><div><b>${fmt(NOW_FLOW.spend)}</b><span>今年の年間支出</span></div><div><b style="color:${d<0?"var(--red)":"var(--green)"}">${d>=0?"+":""}${fmt(d)}</b><span>差額</span></div>`}
-   {const fl=rows.slice(1),ret=num(S.v.retireAge),sum=(arr,k)=>arr.reduce((t,x)=>t+(x[k]||0),0),wk=fl.filter(x=>x.age<=ret),rt=fl.filter(x=>x.age>ret);
-    const iA=sum(fl,"inc"),sA=sum(fl,"spend"),iW=sum(wk,"inc"),sW=sum(wk,"spend"),iR=sum(rt,"inc"),sR=sum(rt,"spend");
-    const line=(t,i,e)=>`<div class="row"><div class="lbl">${t}<small>収入 ${fmt(i)}／支出 ${fmt(e)}</small></div><div class="val" style="color:${i-e<0?"var(--red)":"var(--green)"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</div></div>`;
-    document.getElementById("aFlowTotal").innerHTML=line(`<b>今から${END_AGE}歳までの合計</b>`,iA,sA)+line(`働いている間（〜${ret}歳）`,iW,sW)+line(`退職後（${ret+1}〜${END_AGE}歳）`,iR,sR);}
+   {const at=document.getElementById("aFlowTotal");if(at&&TOT_NOTE)at.innerHTML=TOT_NOTE.T.map(([t,i,e],k)=>`<div class="row"><div class="lbl">${k?t:"<b>"+t+"</b>"}<small>収入 ${fmt(i)}／支出 ${fmt(e)}</small></div><div class="val" style="color:${i-e<0?"var(--red)":"var(--green)"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</div></div>`).join("")+`<div class="row"><div class="lbl"><small>${TOT_NOTE.note}</small></div></div>`;}
    document.getElementById("aFlow").innerHTML=`<thead><tr><th>年</th><th>年齢</th><th>年収</th><th>収入</th><th>年間支出</th><th>差額</th><th>率</th></tr></thead><tbody>`+
      (NOW_FLOW?`<tr style="background:var(--fill)"><td>${Y}</td><td>${a0}歳（今）</td><td>${Math.round(NOW_FLOW.gross)}</td><td>${Math.round(NOW_FLOW.net)}</td><td>${Math.round(NOW_FLOW.spend)}</td><td>${Math.round(NOW_FLOW.net-NOW_FLOW.spend)}</td><td>${((NOW_FLOW.net-NOW_FLOW.spend)/NOW_FLOW.net*100).toFixed(0)}%</td></tr>`:"")+
      rows.slice(1).map(x=>{const d=x.inc-x.spend;return`<tr><td>${Y+Math.round(x.age-a0)}</td><td>${Math.round(x.age)}歳</td><td>${x.grossY?Math.round(x.grossY):"–"}</td><td>${Math.round(x.inc)}</td><td>${Math.round(x.spend)}</td><td class="${d<0?"minus":""}">${d>=0?"+":""}${Math.round(d)}</td><td>${x.inc>0?(d/x.inc*100).toFixed(0)+"%":"–"}</td></tr>`}).join("")+`</tbody>`;}

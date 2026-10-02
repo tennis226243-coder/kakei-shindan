@@ -1124,11 +1124,11 @@ function calc(){
    const top=rowsC.map(r=>({n:r[0],d:r[1]-r[2]})).sort((a,b)=>b.d-a.d)[0];
    CMP_HTML.sum=`<div class="stgtip" style="margin:0 0 6px">${top&&top.d>0.5?`いちばん多めなのは <b>${top.n}</b>（月${r1(top.d)}万円多い）だよ。`:"どのカテゴリーも同じ年収の家庭と同じくらいか少なめだよ！"}</div>`;CMP_HTML.s=rowsC.map(([n,m,t])=>{const pc=t>0?(m-t)/t*100:0;const w=Math.min(100,m/Math.max(t,m,0.1)*100),w2=Math.min(100,t/Math.max(t,m,0.1)*100);return `<div class="stat"><div class="top"><span>${n}</span><em style="color:${pc>5?"#E0356F":pc<-5?"#23A04A":"inherit"}">${pc>=0?"+":""}${Math.round(pc)}%</em></div><div class="bar" style="height:10px"><i style="width:${w}%;--c:var(--pink)"></i></div><div class="bar" style="height:10px;margin-top:3px"><i style="width:${w2}%;--c:var(--cyan)"></i></div><small>あなた 月${r1(m)}万（ピンク）／同じ年収の家庭 月${r1(t)}万（水色）</small></div>`}).join("")+`<p class="pnote" style="margin:6px 0 0">${note}</p>`;renderCmp()}
   {const fl=rows.slice(1),ret=v.retireAge,dv=x=>Math.pow(1+v.infl/100,x.age-v.age),wk=fl.filter(x=>x.age<=ret),rt=fl.filter(x=>x.age>ret);
-   // 収入から iDeCo の受け取り（自分で積み立てたお金の取り崩し）を除き、今の価値に直して合計
-   const sI=a=>a.reduce((t,x)=>t+(x.inc-(x.ide||0))/dv(x),0),sE=a=>a.reduce((t,x)=>t+x.spend/dv(x),0),sD=a=>a.reduce((t,x)=>t+(x.ide||0)/dv(x),0),sP=a=>a.reduce((t,x)=>t+(x.pens||0)/dv(x),0);
+   // 今の価値に直して合計（iDeCoの年金受け取りも収入に含める）
+   const sI=a=>a.reduce((t,x)=>t+x.inc/dv(x),0),sE=a=>a.reduce((t,x)=>t+x.spend/dv(x),0),sD=a=>a.reduce((t,x)=>t+(x.ide||0)/dv(x),0),sP=a=>a.reduce((t,x)=>t+(x.pens||0)/dv(x),0);
    const T=[[`今から${END_AGE}歳まで`,sI(fl),sE(fl)],[`働いている間（〜${Math.round(ret)}歳）`,sI(wk),sE(wk)],[`退職後（${Math.round(ret)+1}〜${END_AGE}歳）`,sI(rt),sE(rt)]];
-   const ideT=sD(fl),pR=sP(rt),yrs=Math.max(1,rt.length);
-   const note=`今の価値（物価上昇を除いた金額）。退職後の収入はほぼ年金で、手取りで年平均${fmt(pR/yrs)}（月${r1(pR/yrs/12)}万円）。iDeCoの受け取り（${fmt(ideT)}）は自分で積み立てたお金の取り崩しなので、収入に含めていません。支出に積立投資は含みません。`;
+   const ideT=sD(fl),ideR=sD(rt),pR=sP(rt),yrs=Math.max(1,rt.length);
+   const note=`今の価値（物価上昇を除いた金額）。退職後の収入の内訳：年金（手取り）年平均${fmt(pR/yrs)}（月${r1(pR/yrs/12)}万円）${ideR>0.5?`、iDeCoの受け取り 合計${fmt(ideR)}（${S.v.dcMethod==="一時金"?"一時金":`${S.v.dcYears}年間の分割`}）`:""}。支出に積立投資は含みません。`;
    const dt=document.getElementById("dTotals");if(dt)dt.innerHTML=T.map(([t,i,e],k)=>`<div class="row"><div class="lbl">${k?t:"<b>"+t+"</b>"}<small>収入 ${fmt(i)}／支出 ${fmt(e)}</small></div><div class="val" style="color:${i-e<0?"var(--red)":"var(--green)"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</div></div>`).join("")+`<div class="row"><div class="lbl"><small>${note}</small></div></div>`;
    const st=document.getElementById("sTotals");if(st)st.innerHTML=T.map(([t,i,e])=>`<div class="stat"><div class="top"><span>${t}</span><em style="color:${i-e<0?"#E0356F":"#23A04A"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</em></div><small>入ってくるお金 ${fmt(i)}／出ていくお金 ${fmt(e)}</small></div>`).join("")+`<p class="pnote" style="margin:6px 0 0">${note}</p>`;
    TOT_NOTE={T,note};}

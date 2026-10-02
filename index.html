@@ -449,8 +449,9 @@ body.setup .view{padding-top:12px!important}
   <div class="group" id="aCheck"></div>
   <div class="gh">年間の収支（予想・万円）</div>
   <div class="group kpi" id="aFlowKpi"></div>
+  <div class="group" id="aFlowTotal" style="margin-top:8px"></div>
   <div class="group" style="margin-top:8px"><div style="overflow-x:auto;max-height:380px;overflow-y:auto"><table class="audit" id="aFlow"></table></div></div>
-  <p class="gf">年収は昇給の予定から予想した額面。収入は手取り＋児童手当＋配偶者の手取り＋年金など。年間支出は生活費・教育費・ローン返済・イベント・一括購入の合計（積立投資は含みません）。差額＝収入−年間支出で、この分が貯蓄（積立を含む）に回ります。</p>
+  <p class="gf">年収は昇給の予定から予想した額面。収入は手取り＋児童手当＋配偶者の手取り＋年金など。年間支出は生活費・教育費・ローン返済・イベント・一括購入の合計（積立投資は含みません）。差額＝収入−年間支出で、この分が貯蓄（積立を含む）に回ります。合計は将来のお金の額面（物価上昇込み）で、退職金・iDeCoの受け取りも収入に含みます。</p>
   <div class="gh">年末の実績の推移</div>
   <div class="group" style="margin-bottom:8px"><div class="row tap" role="button" tabindex="0" id="toActuals">📝 源泉徴収票から年末の実績を入力・予想と比較する</div></div>
   <div class="group"><div class="chart" id="aChart"></div><div class="legend"><span><i style="background:var(--tint)"></i>金融資産</span><span><i style="background:var(--red)"></i>ローン残高</span><span><i style="background:var(--green)"></i>純資産</span></div></div>
@@ -1250,6 +1251,10 @@ function renderAssets(){{const t=document.getElementById("toActuals");if(t&&!t.d
   // 年間の収支
   {const rows=(CH.chart&&CH.chart.rows)||[],Y=new Date().getFullYear(),a0=num(S.v.age);
    if(NOW_FLOW){const d=NOW_FLOW.net-NOW_FLOW.spend;document.getElementById("aFlowKpi").innerHTML=`<div><b>${fmt(NOW_FLOW.net)}</b><span>今年の収入</span></div><div><b>${fmt(NOW_FLOW.spend)}</b><span>今年の年間支出</span></div><div><b style="color:${d<0?"var(--red)":"var(--green)"}">${d>=0?"+":""}${fmt(d)}</b><span>差額</span></div>`}
+   {const fl=rows.slice(1),ret=num(S.v.retireAge),sum=(arr,k)=>arr.reduce((t,x)=>t+(x[k]||0),0),wk=fl.filter(x=>x.age<=ret),rt=fl.filter(x=>x.age>ret);
+    const iA=sum(fl,"inc"),sA=sum(fl,"spend"),iW=sum(wk,"inc"),sW=sum(wk,"spend"),iR=sum(rt,"inc"),sR=sum(rt,"spend");
+    const line=(t,i,e)=>`<div class="row"><div class="lbl">${t}<small>収入 ${fmt(i)}／支出 ${fmt(e)}</small></div><div class="val" style="color:${i-e<0?"var(--red)":"var(--green)"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</div></div>`;
+    document.getElementById("aFlowTotal").innerHTML=line(`<b>今から${END_AGE}歳までの合計</b>`,iA,sA)+line(`働いている間（〜${ret}歳）`,iW,sW)+line(`退職後（${ret+1}〜${END_AGE}歳）`,iR,sR);}
    document.getElementById("aFlow").innerHTML=`<thead><tr><th>年</th><th>年齢</th><th>年収</th><th>収入</th><th>年間支出</th><th>差額</th><th>率</th></tr></thead><tbody>`+
      (NOW_FLOW?`<tr style="background:var(--fill)"><td>${Y}</td><td>${a0}歳（今）</td><td>${Math.round(NOW_FLOW.gross)}</td><td>${Math.round(NOW_FLOW.net)}</td><td>${Math.round(NOW_FLOW.spend)}</td><td>${Math.round(NOW_FLOW.net-NOW_FLOW.spend)}</td><td>${((NOW_FLOW.net-NOW_FLOW.spend)/NOW_FLOW.net*100).toFixed(0)}%</td></tr>`:"")+
      rows.slice(1).map(x=>{const d=x.inc-x.spend;return`<tr><td>${Y+Math.round(x.age-a0)}</td><td>${Math.round(x.age)}歳</td><td>${x.grossY?Math.round(x.grossY):"–"}</td><td>${Math.round(x.inc)}</td><td>${Math.round(x.spend)}</td><td class="${d<0?"minus":""}">${d>=0?"+":""}${Math.round(d)}</td><td>${x.inc>0?(d/x.inc*100).toFixed(0)+"%":"–"}</td></tr>`}).join("")+`</tbody>`;}

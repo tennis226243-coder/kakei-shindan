@@ -1,0 +1,18 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 家計：招待コード（12文字のランダムな合言葉）を知っているログイン済みの人だけが読み書きできる
+    // 一覧の取得（list）は禁止しているので、他人の招待コードを探すことはできない
+    match /households/{hid} {
+      allow get, create, update, delete: if request.auth != null && hid.size() >= 10;
+      allow list: if false;
+      match /results/{rid} {
+        allow read, write: if request.auth != null;
+      }
+    }
+    // 自分がどの家計に入っているかの記録：本人だけ
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+  }
+}

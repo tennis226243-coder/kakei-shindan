@@ -353,6 +353,7 @@ body.setup .view{padding-top:12px!important}
    <li><b>手取り</b>＝額面 − 社会保険料（厚生年金9.15%〔上限あり〕＋健康保険5.0%＋雇用保険0.55%＋40〜64歳は介護保険0.8%）− 所得税 − 住民税（2026年の税制・配偶者控除を反映）＋住宅ローン控除（年末残高×0.7%、13年間）</li>
    <li><b>収入</b>＝手取り＋配偶者の手取り＋児童手当＋年金（受け取り開始後）＋退職金（退職所得控除を引いた残りの1/2に課税）＋iDeCoの受け取り</li>
    <li><b>基本生活費（今）</b>＝今の年間支出（手取り＋手当−実際に貯まる額）− ローン返済 − 今の保育料・学費。以後は物価上昇率だけ毎年増やします（今の暮らしの水準を保つ前提）</li>
+   <li><b>子どもの生活費</b>：食費・衣類・日用品・携帯・おこづかいの1人あたり年額を、国立成育医療研究センター「子育て費用調査2024」から未就学58万・小学生70万・中学生87万・高校生101万（大学生で自宅なら101万、仕送り中は仕送りに含む）とし、22歳で独立すると0。今の基本生活費には今の子どもの分が含まれているとみなし、その分を除いた「大人の生活費」に毎年の子どもの生活費を足します</li>
    <li><b>支出</b>＝基本生活費＋住宅ローン返済（毎月の利息を計算）＋追加ローン＋子どもの費用（保育料・学費・入学金・仕送り・生活費の増加）＋ライフイベント＋一括購入</li>
    <li><b>退職後の生活費</b>＝退職直前の基本生活費×「退職後の生活費」（初期値88%）×年齢係数（65〜69歳1.000・70〜74歳0.962・75歳以上0.837）</li>
    <li><b>貯蓄</b>＝収入−支出。余りは翌年の預貯金に繰り越し、積立額は投資へ。足りない年は投資から取り崩します</li>
@@ -508,7 +509,7 @@ const LISTS={
    fields:[["rfrom","開始","年",""],["rto","終了","年",""],["rrate","昇給率","%","毎年この割合で上がる"]]},
  children:{title:"子ども",add:"子どもを追加",
    make:()=>({age:"0",care:"0",extra:"3",hs:"公立",univ:"国公立",csend:"0",csendY:"4",csendFix:true,cfund:"0",cmonthly:"0",csave:false,indep:"0",cuse:true,crate:"1.5"}),
-   fields:[["cname","名前（呼び名）","txt",""],["cbirth","生年月日（出産予定日）","date","入れると年齢を自動で計算します"],["age","年齢","歳","まだ生まれていない場合は −1（1年後に誕生）など"],["care","保育料・幼稚園代（月）","万円","児童手当を引く前の実際の支払額。児童手当は自動で収入に加えます。無償化の年齢からは自動で0円"],["extra","生活費の増加（月）","万円","今の生活費に含まれていない分"],["hs","高校","sel","平均的な公立／私立（2026年度からの授業料支援を反映）"],["univ","大学","sel",""],["csend","仕送り（月）","万円","一人暮らしをする場合。18歳の年から。仕送りの期間は、食費などの「成長に伴う生活費」を仕送りに含めて計算します"],["csendY","仕送りの年数","年","4年制大学なら4"],["csendFix","仕送りの金額を固定する",true,"chk","オン：入力した月額のまま（10万円×12か月×4年＝480万円）。オフ：物価上昇分だけ増えます"],["cfund","子ども名義の貯蓄","万円","学資保険・ジュニアNISAなど"],["cmonthly","子ども名義への毎月の積立","万円","18歳まで"],["csave","児童手当を子ども名義で貯める","chk",""],["csaveFrom","貯め始める月","ym","この月から受け取る手当を子ども名義へ"],["cuse","大学の費用に使う","chk","オフにすると18歳以降は使わずに残します"],["crate","子ども名義の運用利回り","%","預金だけなら0%"]]},
+   fields:[["cname","名前（呼び名）","txt",""],["cbirth","生年月日（出産予定日）","date","入れると年齢を自動で計算します"],["age","年齢","歳","まだ生まれていない場合は −1（1年後に誕生）など"],["care","保育料・幼稚園代（月）","万円","児童手当を引く前の実際の支払額。児童手当は自動で収入に加えます。無償化の年齢からは自動で0円"],["hs","高校","sel","平均的な公立／私立（2026年度からの授業料支援を反映）"],["univ","大学","sel",""],["csend","仕送り（月）","万円","一人暮らしをする場合。18歳の年から。仕送りの期間は、食費などの「成長に伴う生活費」を仕送りに含めて計算します"],["csendY","仕送りの年数","年","4年制大学なら4"],["csendFix","仕送りの金額を固定する",true,"chk","オン：入力した月額のまま（10万円×12か月×4年＝480万円）。オフ：物価上昇分だけ増えます"],["cfund","子ども名義の貯蓄","万円","学資保険・ジュニアNISAなど"],["cmonthly","子ども名義への毎月の積立","万円","18歳まで"],["csave","児童手当を子ども名義で貯める","chk",""],["csaveFrom","貯め始める月","ym","この月から受け取る手当を子ども名義へ"],["cuse","大学の費用に使う","chk","オフにすると18歳以降は使わずに残します"],["crate","子ども名義の運用利回り","%","預金だけなら0%"]]},
  loans:{title:"追加のローン",add:"ローンを追加",
    make:()=>{const d=new Date();return{lname:"車のローン",lamount:"300",lyear:String(d.getFullYear()+1),lmonth:"4",lterm:"5",lrate:"2.5"}},
    fields:[["lname","名前","txt",""],["lamount","借入額","万円","借りたお金は購入に使う想定"],["lyear","開始年","年",""],["lmonth","開始月","月",""],["lterm","返済期間","年",""],["lrate","金利","%",""]]},
@@ -704,6 +705,11 @@ const QSH={food:[19.9+5.6,20.0+6.8,21.3+6.9,21.6+6.7,19.4+6.9],house:[18.2,14.8,
 // 年金の手取り：年金からは所得税・住民税・国民健康保険料・介護保険料が引かれる。1人あたりの年金額（今の価値）が
 // 年150万円以下なら95%、250万円以下なら90%、それを超えると86%を手取りの目安にする（一般に額面の85〜95%）
 function pensNet(a,pg){if(!(a>0))return 0;const t=a/(pg||1);return a*(t<=150?0.95:t<=250?0.90:0.86)}
+// 子どもの生活費（食費・衣類・日用品・携帯・おこづかい／1人・年・今の価値）
+// 国立成育医療研究センター「0〜18歳の子育て費用調査2024」第一子の年間費用（衣類・服飾雑貨＋食費＋生活用品＋携帯電話＋おこづかい）を段階ごとに平均
+// 未就学 約58万・小学生 約70万・中学生 約87万・高校生 約101万。大学生（自宅）は高校生と同じ、仕送り中は仕送りに含む。22歳で独立して0
+function kidLive(a,k){if(a<0)return 0;if(a<7)return 58;if(a<13)return 70;if(a<16)return 87;if(a<19)return 101;
+  if(a<22){if(k.univ==="進学しない")return 0;if(k.send>0&&a>=18&&a<18+k.sendY)return 0;return 101}return 0}
 function eldIdx(a){return a<70?1:a<75?0.962:0.837}
 // 年代別の黒字率（参考）：総務省「家計調査2025」二人以上の世帯のうち勤労者世帯（黒字＝可処分所得−消費支出。住宅ローンの元本返済も含む）
 const KOKU={20:44.4,30:44.4,40:38.9,50:34.2,60:22.4};
@@ -797,8 +803,9 @@ function calc(){
   // 基本生活費（今）＝ 今の年間支出（手取り＋手当−実際に貯まる額）− 住宅ローン等の返済 − 今の保育料・学費
   const eduNow=kids.reduce((s,k)=>s+(k.age>=6?edu(k.age,k):0),0);
   const B0=Math.max(0,(net-v.actualSave)-v.loanAnnual-loans.reduce((s,L)=>s+L.payInYear(1),0)-careNow*12-eduNow);
-  B0_INFO={e0:net-v.actualSave,loan:v.loanAnnual+loans.reduce((s,L)=>s+L.payInYear(1),0),care:careNow*12,edu:eduNow,b0:B0}; // 把握できていない支出（年額）
-  {const e=document.getElementById("b0Info");if(e&&B0_INFO){const I=B0_INFO;e.innerHTML=`<div class="lbl"><b>予想に使う「基本生活費」</b><small>今の年間支出 ${fmt(I.e0)}（手取り＋手当−実際に貯まる額）− ローン返済 ${fmt(I.loan)} − 保育料 ${fmt(I.care)} − 学費 ${fmt(I.edu)} ＝ 年 ${fmt(I.b0)}（月${r1(I.b0/12)}万円）。これを物価上昇に合わせて増やし、子どもの費用・ローン・イベントは別に足します。上の内訳は家計簿の予算と比較に使います</small></div>`}}
+  const kidNow=kids.reduce((s,k)=>s+kidLive(k.age,k),0),adult0=Math.max(B0*0.4,B0-kidNow);
+  B0_INFO={kidNow,adult0,e0:net-v.actualSave,loan:v.loanAnnual+loans.reduce((s,L)=>s+L.payInYear(1),0),care:careNow*12,edu:eduNow,b0:B0}; // 把握できていない支出（年額）
+  {const e=document.getElementById("b0Info");if(e&&B0_INFO){const I=B0_INFO;e.innerHTML=`<div class="lbl"><b>予想に使う「基本生活費」</b><small>今の年間支出 ${fmt(I.e0)}（手取り＋手当−実際に貯まる額）− ローン返済 ${fmt(I.loan)} − 保育料 ${fmt(I.care)} − 学費 ${fmt(I.edu)} ＝ 年 ${fmt(I.b0)}（月${r1(I.b0/12)}万円）。このうち子どもの生活費（統計の目安）${fmt(I.kidNow)}を除いた大人の生活費 年${fmt(I.adult0)}を物価上昇に合わせて増やし、子どもの生活費は年齢に合わせて（未就学58万・小学生70万・中学生87万・高校生101万／年）、独立すると0にします。上の内訳は家計簿の予算と比較に使います</small></div>`}}
   {const e=document.getElementById("saveAmt");if(e)e.textContent=BUDGET?`「手取り−支出」で計算中：今年の余り 約${fmt(v.actualSave)}（手取りの${v.saveRate}%）。この欄の値は使いません`:`＝ 年 約${fmt(v.actualSave)}（月 約${r1(v.actualSave/12)}万円）`;}
   const rate=v.actualSave/net*100,rateAct=rate;
   PLAN_M=planAnnual/12;const emerg=v.cash/(planAnnual/12),houseRatio=(v.loanAnnual+loanPayNow)/net*100;
@@ -908,9 +915,9 @@ function calc(){
       const c=careFee(k,a,order(ages,i));let e=edu(a,k)*f;
       if(k.use&&a>=18&&a<22&&kf[i]>0){const use=Math.min(kf[i],e);kf[i]-=use;e-=use;kidUse+=use;}
       const snd=k.send>0&&a>=18&&a<18+k.sendY?k.send*12*(k.sendFix?1:f):0;
-      const grow=0; /* 成長に伴う食費・衣類・小遣いなどの増加（年額）。仕送り中は仕送りに含む */acc[i].send=(acc[i].send||0)+snd;
-      exp+=c+e+ent+grow*f+snd;if(a<22)exp+=k.extra*12*f;acc[i].live=(acc[i].live||0)+grow*f;acc[i].care+=c;acc[i].edu+=edu(a,k)*f;if(a>=18&&a<22)acc[i].univ=(acc[i].univ||0)+edu(a,k)*f;acc[i].ent=(acc[i].ent||0)+ent;
-      kidCost+=c+edu(a,k)*f+ent+grow*f+snd+(a<22?k.extra*12*f:0);
+      const grow=kidLive(a,k); /* 子どもの生活費（表示用。支出には「生活費」として計上済み） */acc[i].send=(acc[i].send||0)+snd;
+      exp+=c+e+ent+snd;acc[i].live=(acc[i].live||0)+grow*f;acc[i].care+=c;acc[i].edu+=edu(a,k)*f;if(a>=18&&a<22)acc[i].univ=(acc[i].univ||0)+edu(a,k)*f;acc[i].ent=(acc[i].ent||0)+ent;
+      kidCost+=c+edu(a,k)*f+ent+grow*f+snd;
       const al=allowance1(ages,i);acc[i].allow+=al;
       let fr=0;if(k.save){const d0=new Date(),[sy,sm]=(k.saveFrom||"").split("-").map(Number);
         const off=sy?(sy-d0.getFullYear())*12+(sm-(d0.getMonth()+1)):0; // 今月から何か月後に開始
@@ -923,8 +930,10 @@ function calc(){
     const indepCut=0;
     const retF=age>v.retireAge?v.retireRatio/100*eldIdx(age)/eldIdx(Math.max(v.retireAge+1,65)):1;
     // 働いている間：生活費は手取りに連動（＝実際に貯まる割合を保ったまま貯蓄額も収入に合わせて増える）
-    let base;if(age<=v.retireAge&&wage0>0){base=(B0-(v._cut||0)*12)*f;lastBase=base;retY=age}
-    else{const lb=lastBase!=null?lastBase:baseLiving*f;base=lb*Math.pow(1+inf,retY!=null?age-retY:y)*retF}
+    // 生活費＝大人の生活費（今の水準を物価分だけ増やす）＋子どもの生活費（年齢で増え、独立で0）
+    const kidsT=kids.reduce((s,k)=>s+kidLive(k.age+y,k),0)*f;
+    let base;if(age<=v.retireAge&&wage0>0){const ad=(adult0-(v._cut||0)*12)*f;base=ad+kidsT;lastBase=ad;retY=age}
+    else{const lb=lastBase!=null?lastBase:(adult0-(v._cut||0)*12)*f;base=lb*Math.pow(1+inf,retY!=null?age-retY:y)*retF+kidsT}
     exp+=Math.max(0,base-indepCut*f)*(dead?0.75:1)+pay;
     // 持ち家の維持費：購入価格の1%（選んだ場合）＋修繕積立金の値上がり分
     {const m1=v.maintMode==="購入価格の1%を毎年加える"?v.homePrice*0.01*f:0,m2=v.shuzen*12*f*(Math.pow(1+v.shuzenUp/100,Math.min(y,30))-1);exp+=m1+m2}
@@ -1094,7 +1103,7 @@ function calc(){
   renderIde(ID,v);
   document.getElementById("audit").innerHTML=`<thead><tr><th>年齢</th><th>収入</th><th>うち年金</th><th>うちiDeCo</th><th>支出</th><th>運用益</th><th>増減</th><th>資産</th></tr></thead><tbody>`+
     rows.slice(1).map((x,i)=>`<tr><td>${Math.round(x.age)}歳</td><td>${Math.round(x.inc)}</td><td>${x.pens?Math.round(x.pens):"–"}</td><td>${x.ide?Math.round(x.ide):"–"}</td><td>${Math.round(x.spend)}</td><td>${Math.round(x.gain)}</td><td class="${x.fin-rows[i].fin<0?"minus":""}">${x.fin-rows[i].fin>=0?"+":""}${Math.round(x.fin-rows[i].fin)}</td><td>${Math.round(x.fin).toLocaleString()}</td></tr>`).join("")+`</tbody>`;
-  document.getElementById("kidcost").innerHTML=kids.length?kids.map((k,i)=>`<div class="row"><div class="lbl">${esc(S.children[i].cname||"子ども"+(i+1))}<small>保育料 ${fmt(acc[i].care)}・小〜高の学費 ${fmt(acc[i].edu-(acc[i].univ||0))}・大学の授業料など ${fmt(acc[i].univ||0)}・入学金など ${fmt(acc[i].ent||0)}・仕送り ${fmt(acc[i].send||0)}・手当 −${fmt(acc[i].allow)}</small></div><div class="val">${fmt(acc[i].care+acc[i].edu+(acc[i].ent||0)+(acc[i].send||0)+(acc[i].live||0)-acc[i].allow)}</div></div>`).join(""):`<div class="row"><div class="lbl" style="color:var(--sec)">子どもは登録されていません</div></div>`;
+  document.getElementById("kidcost").innerHTML=kids.length?kids.map((k,i)=>`<div class="row"><div class="lbl">${esc(S.children[i].cname||"子ども"+(i+1))}<small>保育料 ${fmt(acc[i].care)}・小〜高の学費 ${fmt(acc[i].edu-(acc[i].univ||0))}・大学の授業料など ${fmt(acc[i].univ||0)}・入学金など ${fmt(acc[i].ent||0)}・仕送り ${fmt(acc[i].send||0)}・生活費（食費・衣類など） ${fmt(acc[i].live||0)}・手当 −${fmt(acc[i].allow)}</small></div><div class="val">${fmt(acc[i].care+acc[i].edu+(acc[i].ent||0)+(acc[i].send||0)+(acc[i].live||0)-acc[i].allow)}</div></div>`).join(""):`<div class="row"><div class="lbl" style="color:var(--sec)">子どもは登録されていません</div></div>`;
 
   const A=[];
   if(unknown>=12)A.push(`入力した内訳だと年${fmt(calcSave)}貯まる計算ですが、実際は年${fmt(v.actualSave)}です。差の年${fmt(unknown)}（月${r1(unknown/12)}万円）は内訳に入っていない支出として予想に含めています。使い道が分かれば、ここが一番大きな見直しポイントです。`);

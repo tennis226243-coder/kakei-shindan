@@ -359,6 +359,7 @@ body.setup .view{padding-top:12px!important}
    <li><b>貯蓄</b>＝収入−支出。余りは翌年の預貯金に繰り越し、積立額は投資へ。足りない年は投資から取り崩します</li>
    <li><b>運用</b>：株式・投資信託は毎月の積立を月複利で運用。NISAの上限を超える部分の運用益には20.315%の税金。iDeCoは厚生労働省の公的年金シミュレーターと同じ方法</li>
    <li><b>年金</b>＝基礎年金（手取りは1人あたりの年金額に応じて額面の95%・90%・86%）（2026年度満額 年84.73万円 ×（480か月−学生納付特例で追納していない月数）÷480）＋厚生年金（平均年収÷12×5.481/1000×加入月数）。60歳以降も会社員として働く期間は「経過的加算」として基礎年金と同じ単価で上乗せ（厚生年金の加入は480か月まで）。受け取り開始が65歳より早いと1か月0.4%減、遅いと0.7%増。条件を満たせば加給年金</li>
+   <li><b>大学院</b>：修士は2年、博士は5年（修士2年＋博士3年）。国立は標準額（授業料年53.58万円・入学金28.2万円）、私立は文部科学省の調査の博士前期課程の平均（授業料77.6万円＋施設設備費7.6万円、入学料20.3万円）。在学中は自宅なら子どもの生活費が続き、修了の年に独立します</li>
    <li><b>教育費</b>：文部科学省「子供の学習費調査（令和5年度）」、私立大学の学生納付金調査（令和7年度）、国立大学の標準額。高校は2026年4月からの就学支援金を反映</li>
    <li><b>90歳まで資金が持つ確率</b>：運用利回りに毎年ランダムなブレ（標準偏差12%）を加えて200回試算し、資産が一度も0を下回らなかった割合</li>
    <li><b>家計の余裕／必要な節約</b>：基本生活費を月いくら増減すれば、90歳まで資産が生活費6か月分を下回らないかを二分探索で求めます</li>
@@ -415,7 +416,7 @@ body.setup .view{padding-top:12px!important}
   <div class="pbox" id="sTotals"></div>
   <h2><span class="tag">STAGE</span>年代ごとのステージ</h2>
   <div class="stages" id="sStages"></div>
-  <p class="pnote" style="margin:-4px 20px 8px">★★★ すべて良好<br>★★☆ 注意したい点あり（貯蓄率の低下・預貯金が少ない時期など）<br>★☆☆ この年代にお金が底をつく</p>
+  <p class="pnote" style="margin:-4px 20px 8px">金額は、その年代の終わり（例：30代なら39歳）の資産の合計（預貯金・株式・投資信託・iDeCo、将来の額面）<br>★★★ すべて良好<br>★★☆ 注意したい点あり（貯蓄率の低下・預貯金が少ない時期など）<br>★☆☆ この年代にお金が底をつく</p>
   <p class="stgtip" id="sStageTip"></p>
   <h2><span class="tag">MAP</span>お金の未来マップ</h2>
   <div class="pbox"><div class="annchips" id="annFs"></div><div class="chart" id="schart"></div><p class="pnote">ピンクの線がお金の合計、水色の帯が「運用が良い〜悪い」場合の幅。●は年末の実績（数字は予想との差）。グラフをタップすると詳しく見られるよ。</p></div>
@@ -509,7 +510,7 @@ const LISTS={
    fields:[["rfrom","開始","年",""],["rto","終了","年",""],["rrate","昇給率","%","毎年この割合で上がる"]]},
  children:{title:"子ども",add:"子どもを追加",
    make:()=>({age:"0",care:"0",extra:"3",hs:"公立",univ:"国公立",csend:"0",csendY:"4",csendFix:true,cfund:"0",cmonthly:"0",csave:false,indep:"0",cuse:true,crate:"1.5"}),
-   fields:[["cname","名前（呼び名）","txt",""],["cbirth","生年月日（出産予定日）","date","入れると年齢を自動で計算します"],["age","年齢","歳","まだ生まれていない場合は −1（1年後に誕生）など"],["care","保育料・幼稚園代（月）","万円","児童手当を引く前の実際の支払額。児童手当は自動で収入に加えます。無償化の年齢からは自動で0円"],["hs","高校","sel","平均的な公立／私立（2026年度からの授業料支援を反映）"],["univ","大学","sel",""],["csend","仕送り（月）","万円","一人暮らしをする場合。18歳の年から。仕送りの期間は、食費などの「成長に伴う生活費」を仕送りに含めて計算します"],["csendY","仕送りの年数","年","4年制大学なら4"],["csendFix","仕送りの金額を固定する",true,"chk","オン：入力した月額のまま（10万円×12か月×4年＝480万円）。オフ：物価上昇分だけ増えます"],["cfund","子ども名義の貯蓄","万円","学資保険・ジュニアNISAなど"],["cmonthly","子ども名義への毎月の積立","万円","18歳まで"],["csave","児童手当を子ども名義で貯める","chk",""],["csaveFrom","貯め始める月","ym","この月から受け取る手当を子ども名義へ"],["cuse","大学の費用に使う","chk","オフにすると18歳以降は使わずに残します"],["crate","子ども名義の運用利回り","%","預金だけなら0%"]]},
+   fields:[["cname","名前（呼び名）","txt",""],["cbirth","生年月日（出産予定日）","date","入れると年齢を自動で計算します"],["age","年齢","歳","まだ生まれていない場合は −1（1年後に誕生）など"],["care","保育料・幼稚園代（月）","万円","児童手当を引く前の実際の支払額。児童手当は自動で収入に加えます。無償化の年齢からは自動で0円"],["hs","高校","sel","平均的な公立／私立（2026年度からの授業料支援を反映）"],["univ","大学","sel",""],["grad","大学院","sel","大学卒業後に進学する場合"],["gradType","大学院の種類","sel","国立は授業料53.58万円、私立は平均約85万円（年）"],["csend","仕送り（月）","万円","一人暮らしをする場合。18歳の年から。仕送りの期間は、食費などの「成長に伴う生活費」を仕送りに含めて計算します"],["csendY","仕送りの年数","年","4年制大学なら4"],["csendFix","仕送りの金額を固定する",true,"chk","オン：入力した月額のまま（10万円×12か月×4年＝480万円）。オフ：物価上昇分だけ増えます"],["cfund","子ども名義の貯蓄","万円","学資保険・ジュニアNISAなど"],["cmonthly","子ども名義への毎月の積立","万円","18歳まで"],["csave","児童手当を子ども名義で貯める","chk",""],["csaveFrom","貯め始める月","ym","この月から受け取る手当を子ども名義へ"],["cuse","大学の費用に使う","chk","オフにすると18歳以降は使わずに残します"],["crate","子ども名義の運用利回り","%","預金だけなら0%"]]},
  loans:{title:"追加のローン",add:"ローンを追加",
    make:()=>{const d=new Date();return{lname:"車のローン",lamount:"300",lyear:String(d.getFullYear()+1),lmonth:"4",lterm:"5",lrate:"2.5"}},
    fields:[["lname","名前","txt",""],["lamount","借入額","万円","借りたお金は購入に使う想定"],["lyear","開始年","年",""],["lmonth","開始月","月",""],["lterm","返済期間","年",""],["lrate","金利","%",""]]},
@@ -567,7 +568,7 @@ function cell(key,label,val,unit,hint,attr){
   if(unit==="ym"){const d=new Date(),opts=[];for(let i=0;i<240;i++){const t=new Date(d.getFullYear(),d.getMonth()+i,1);opts.push(`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}`)}
     const cur=val&&opts.includes(val)?val:(val&&val<opts[0]?opts[0]:val||opts[0]);if(cur&&!opts.includes(cur))opts.push(cur);
     return `<label class="row">${l}<select ${attr}>${opts.map((o,i)=>`<option value="${o}" ${o===cur?"selected":""}>${o.replace(/^(\d+)-0?(\d+)$/,"$1年$2月")}${i===0?"（今月）":""}</option>`).join("")}</select></label>`;}
-  if(unit==="sel"){const opts=key==="region"?Object.keys(REGIONS):key==="dcMethod"?["有期年金","一時金"]:key==="dcYears"?["5","10","15","20"]:key==="hs"?["公立","私立"]:key==="raiseMode"?["昇給の予定を使う",...Object.keys(WCURVES)]:key==="maintMode"?["今の支出に含まれている","購入価格の1%を毎年加える"]:key==="saveMode"?["貯まる割合で計算","手取り−支出で計算"]:UNIV;return `<label class="row">${l}<select ${attr}>${opts.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select></label>`;}
+  if(unit==="sel"){const opts=key==="region"?Object.keys(REGIONS):key==="dcMethod"?["有期年金","一時金"]:key==="dcYears"?["5","10","15","20"]:key==="hs"?["公立","私立"]:key==="grad"?Object.keys(GRAD_Y):key==="gradType"?["国立","私立"]:key==="raiseMode"?["昇給の予定を使う",...Object.keys(WCURVES)]:key==="maintMode"?["今の支出に含まれている","購入価格の1%を毎年加える"]:key==="saveMode"?["貯まる割合で計算","手取り−支出で計算"]:UNIV;return `<label class="row">${l}<select ${attr}>${opts.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select></label>`;}
   const[mn,mx,st]=RANGE[key]||[0,100,1],n=num(val),lo=Math.min(mn,n),hi=Math.max(mx,n),pc=((Math.min(Math.max(n,lo),hi)-lo)/(hi-lo)*100).toFixed(1);
   return `<div class="row num">${l}<input class="box" type="text" inputmode="decimal" ${attr} value="${esc(val)}" aria-label="${label}"><span class="unit">${unit}</span><input class="rng" type="range" min="${lo}" max="${hi}" step="${st}" value="${String(val).trim()===""?lo:n}" style="--p:${pc}%" ${attr} data-r="1" aria-label="${label}（スライダー）"></div>`;
 }
@@ -709,7 +710,7 @@ function pensNet(a,pg){if(!(a>0))return 0;const t=a/(pg||1);return a*(t<=150?0.9
 // 国立成育医療研究センター「0〜18歳の子育て費用調査2024」第一子の年間費用（衣類・服飾雑貨＋食費＋生活用品＋携帯電話＋おこづかい）を段階ごとに平均
 // 未就学 約58万・小学生 約70万・中学生 約87万・高校生 約101万。大学生（自宅）は高校生と同じ、仕送り中は仕送りに含む。22歳で独立して0
 function kidLive(a,k){if(a<0)return 0;if(a<7)return 58;if(a<13)return 70;if(a<16)return 87;if(a<19)return 101;
-  if(a<22){if(k.univ==="進学しない")return 0;if(k.send>0&&a>=18&&a<18+k.sendY)return 0;return 101}return 0}
+  if(a<22+gradY(k)){if(k.univ==="進学しない")return 0;if(k.send>0&&a>=18&&a<18+k.sendY)return 0;return 101}return 0}
 function eldIdx(a){return a<70?1:a<75?0.962:0.837}
 // 年代別の黒字率（参考）：総務省「家計調査2025」二人以上の世帯のうち勤労者世帯（黒字＝可処分所得−消費支出。住宅ローンの元本返済も含む）
 const KOKU={20:44.4,30:44.4,40:38.9,50:34.2,60:22.4};
@@ -720,7 +721,10 @@ const ENT={6:10,12:10}; // 入学準備（ランドセル・制服など）
 const HS_ENT={"公立":1,"私立":25}; // 高校：公立は入学金5,650円＋受験料、私立は入学金（平均約16万）＋施設費等の初年度分＋受験料
 // 大学：文部科学省「私立大学等の令和7年度入学者に係る学生納付金等調査」（授業料96.8万・入学料24.0万・施設設備費17.3万、初年度計150.8万）と国立大学の標準額（入学金28.2万・授業料53.58万）をもとに設定
 const UNIV_ENT={"国公立":31,"私立文系":26,"私立理系":29,"進学しない":0}; // 入学金＋受験料
-function edu(a,k){const u=k.univ,hs=k.hs||"公立";if(a<6)return 0;if(a<12)return 34;if(a<15)return 54;if(a<18)return HS[hs]||HS["公立"];if(a<22)return{"国公立":54,"私立文系":97,"私立理系":129,"進学しない":0}[u]||0; /* 授業料＋施設設備費など（年額） */return 0}
+// 大学院：国立は標準額（授業料53.58万・入学金28.2万）、私立は文部科学省「私立大学等の入学者に係る学生納付金等調査」博士前期課程（授業料77.6万・施設設備費7.6万・入学料20.3万）
+const GRAD_Y={"進学しない":0,"修士（2年）":2,"博士（5年）":5},GRAD_FEE={"国立":54,"私立":85},GRAD_ENT={"国立":31,"私立":23};
+const gradY=k=>k.univ==="進学しない"?0:(GRAD_Y[k.grad]||0);
+function edu(a,k){const u=k.univ,hs=k.hs||"公立";if(a>=22&&a<22+gradY(k))return GRAD_FEE[k.gradType]||54;if(a<6)return 0;if(a<12)return 34;if(a<15)return 54;if(a<18)return HS[hs]||HS["公立"];if(a<22)return{"国公立":54,"私立文系":97,"私立理系":129,"進学しない":0}[u]||0; /* 授業料＋施設設備費など（年額） */return 0}
 function eduOld(a,u){if(a<6)return 0;if(a<12)return 34;if(a<15)return 54;if(a<18)return 60;if(a<22)return{"国公立":110,"私立文系":150,"私立理系":180,"進学しない":0}[u]||0;return 0}
 function region(){const R=REGIONS[S.v.region];return R||{free1:num(S.v.free1),free2:num(S.v.free2),allow:num(S.v.extraAllow),allowTo:num(S.v.extraAllowTo)}}
 function allowance1(ages,i){const R=region(),a=ages[i];if(a<0||a>=22)return 0;const o=ages.filter(x=>x>=0&&x<22&&x>a).length;
@@ -759,7 +763,7 @@ function calc(){
    const nbY=(v.loanBonusM1>0?1:0)+(v.loanBonusM2>0&&v.loanBonusM2!==v.loanBonusM1?1:0);
    v.loanMonthly=v.loanBal>0?M:0;v.loanAnnual=v.loanBal>0?M*12+B*nbY:0;v.loanN=n;
    if(v.loanRateUp>0&&n>0){const ru=(v.loanRate+v.loanRateUp)/1200,rbu=Math.pow(1+ru,6)-1,Pbu=Math.min(v.loanBal,B>0&&nb>0?B*(1-Math.pow(1+rbu,-nb))/rbu:0);v.loanMonthlyUp=(v.loanBal-Pbu)*ru/(1-Math.pow(1+ru,-n))}}
-  const kids=S.children.map(c=>({age:num(c.age),care:num(c.care),extra:num(c.extra),univ:c.univ,hs:c.hs||"公立",send:num(c.csend),sendY:c.csendY==null?4:num(c.csendY),sendFix:c.csendFix!==false,fund:num(c.cfund),monthly:num(c.cmonthly),save:!!c.csave,use:c.cuse!==false,krate:c.crate==null?1.5:num(c.crate),saveFrom:c.csaveFrom||"",indep:num(c.indep)}));
+  const kids=S.children.map(c=>({age:num(c.age),care:num(c.care),extra:num(c.extra),univ:c.univ,grad:c.grad||"進学しない",gradType:c.gradType||"国立",hs:c.hs||"公立",send:num(c.csend),sendY:c.csendY==null?4:num(c.csendY),sendFix:c.csendFix!==false,fund:num(c.cfund),monthly:num(c.cmonthly),save:!!c.csave,use:c.cuse!==false,krate:c.crate==null?1.5:num(c.crate),saveFrom:c.csaveFrom||"",indep:num(c.indep)}));
   const raises=(S.raises||[]).map(x=>({from:num(x.rfrom),to:num(x.rto),rate:num(x.rrate)}));
   const nowY=new Date().getFullYear();
   // 昇給：基本給が入力されていれば基本給にだけ昇給率をかけ、年収を組み立て直す
@@ -910,13 +914,13 @@ function calc(){
     kids.forEach((k,i)=>{const a=ages[i];
       if(a>=0&&a-1<0)add(age,`${kn(i)} 誕生`,0,true,"子ども");
       let ent=0;
-      [[6,"小学校入学"],[12,"中学校入学"],[15,"高校入学"],[18,k.univ==="進学しない"?"高校卒業・就職":"高校卒業・大学入学"],[22,k.univ==="進学しない"?"":"大学卒業・就職"]].forEach(([t,n])=>{if(n&&a>=t&&a-1<t){const en=(t===18?UNIV_ENT[k.univ]||0:t===15?HS_ENT[k.hs||"公立"]:ENT[t]||0)*f;ent+=en;const yr1=t<22?edu(t,k)*f:0;add(age,`${kn(i)} ${n}${en+yr1>0?`（入学金など${Math.round(en)}万＋1年目の${t===18?"授業料など":"学費"}${Math.round(yr1)}万${f>1.05?`・今の価値で${Math.round((en+yr1)/f)}万`:""}）`:""}`,-(en+yr1),true,"子ども")}});
+      [[6,"小学校入学"],[12,"中学校入学"],[15,"高校入学"],[18,k.univ==="進学しない"?"高校卒業・就職":"高校卒業・大学入学"],[22,k.univ==="進学しない"?"":gradY(k)>0?"大学卒業・大学院入学":"大学卒業・就職"],[24,gradY(k)===5?"修士修了・博士課程へ進学":""],[22+gradY(k),gradY(k)>0?"大学院修了・就職":""]].forEach(([t,n])=>{if(n&&a>=t&&a-1<t){const g22=t===22&&gradY(k)>0,en=(t===18?UNIV_ENT[k.univ]||0:t===15?HS_ENT[k.hs||"公立"]:g22?GRAD_ENT[k.gradType]||31:ENT[t]||0)*f;ent+=en;const yr1=(t<22||g22)?edu(t,k)*f:0;add(age,`${kn(i)} ${n}${en+yr1>0?`（入学金など${Math.round(en)}万＋1年目の${t===18?"授業料など":"学費"}${Math.round(yr1)}万${f>1.05?`・今の価値で${Math.round((en+yr1)/f)}万`:""}）`:""}`,-(en+yr1),true,"子ども")}});
       if(a<0)return;
       const c=careFee(k,a,order(ages,i));let e=edu(a,k)*f;
       if(k.use&&a>=18&&a<22&&kf[i]>0){const use=Math.min(kf[i],e);kf[i]-=use;e-=use;kidUse+=use;}
       const snd=k.send>0&&a>=18&&a<18+k.sendY?k.send*12*(k.sendFix?1:f):0;
       const grow=kidLive(a,k); /* 子どもの生活費（表示用。支出には「生活費」として計上済み） */acc[i].send=(acc[i].send||0)+snd;
-      exp+=c+e+ent+snd;acc[i].live=(acc[i].live||0)+grow*f;acc[i].care+=c;acc[i].edu+=edu(a,k)*f;if(a>=18&&a<22)acc[i].univ=(acc[i].univ||0)+edu(a,k)*f;acc[i].ent=(acc[i].ent||0)+ent;
+      exp+=c+e+ent+snd;acc[i].live=(acc[i].live||0)+grow*f;acc[i].care+=c;acc[i].edu+=edu(a,k)*f;if(a>=18&&a<22+gradY(k))acc[i].univ=(acc[i].univ||0)+edu(a,k)*f;acc[i].ent=(acc[i].ent||0)+ent;
       kidCost+=c+edu(a,k)*f+ent+grow*f+snd;
       const al=allowance1(ages,i);acc[i].allow+=al;
       let fr=0;if(k.save){const d0=new Date(),[sy,sm]=(k.saveFrom||"").split("-").map(Number);
@@ -1103,7 +1107,7 @@ function calc(){
   renderIde(ID,v);
   document.getElementById("audit").innerHTML=`<thead><tr><th>年齢</th><th>収入</th><th>うち年金</th><th>うちiDeCo</th><th>支出</th><th>運用益</th><th>増減</th><th>資産</th></tr></thead><tbody>`+
     rows.slice(1).map((x,i)=>`<tr><td>${Math.round(x.age)}歳</td><td>${Math.round(x.inc)}</td><td>${x.pens?Math.round(x.pens):"–"}</td><td>${x.ide?Math.round(x.ide):"–"}</td><td>${Math.round(x.spend)}</td><td>${Math.round(x.gain)}</td><td class="${x.fin-rows[i].fin<0?"minus":""}">${x.fin-rows[i].fin>=0?"+":""}${Math.round(x.fin-rows[i].fin)}</td><td>${Math.round(x.fin).toLocaleString()}</td></tr>`).join("")+`</tbody>`;
-  document.getElementById("kidcost").innerHTML=kids.length?kids.map((k,i)=>`<div class="row"><div class="lbl">${esc(S.children[i].cname||"子ども"+(i+1))}<small>保育料 ${fmt(acc[i].care)}・小〜高の学費 ${fmt(acc[i].edu-(acc[i].univ||0))}・大学の授業料など ${fmt(acc[i].univ||0)}・入学金など ${fmt(acc[i].ent||0)}・仕送り ${fmt(acc[i].send||0)}・生活費（食費・衣類など） ${fmt(acc[i].live||0)}・手当 −${fmt(acc[i].allow)}</small></div><div class="val">${fmt(acc[i].care+acc[i].edu+(acc[i].ent||0)+(acc[i].send||0)+(acc[i].live||0)-acc[i].allow)}</div></div>`).join(""):`<div class="row"><div class="lbl" style="color:var(--sec)">子どもは登録されていません</div></div>`;
+  document.getElementById("kidcost").innerHTML=kids.length?kids.map((k,i)=>`<div class="row"><div class="lbl">${esc(S.children[i].cname||"子ども"+(i+1))}<small>保育料 ${fmt(acc[i].care)}・小〜高の学費 ${fmt(acc[i].edu-(acc[i].univ||0))}・大学${gradY(S.children[i]?{univ:S.children[i].univ,grad:S.children[i].grad}:{})>0?"・大学院":""}の授業料など ${fmt(acc[i].univ||0)}・入学金など ${fmt(acc[i].ent||0)}・仕送り ${fmt(acc[i].send||0)}・生活費（食費・衣類など） ${fmt(acc[i].live||0)}・手当 −${fmt(acc[i].allow)}</small></div><div class="val">${fmt(acc[i].care+acc[i].edu+(acc[i].ent||0)+(acc[i].send||0)+(acc[i].live||0)-acc[i].allow)}</div></div>`).join(""):`<div class="row"><div class="lbl" style="color:var(--sec)">子どもは登録されていません</div></div>`;
 
   const A=[];
   if(unknown>=12)A.push(`入力した内訳だと年${fmt(calcSave)}貯まる計算ですが、実際は年${fmt(v.actualSave)}です。差の年${fmt(unknown)}（月${r1(unknown/12)}万円）は内訳に入っていない支出として予想に含めています。使い道が分かれば、ここが一番大きな見直しポイントです。`);
@@ -1185,7 +1189,7 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
     <div class="coin"><span>${Math.round(r65.age)}歳のお金（今の価値）</span><b>${fmt(r65.fin/dv)}</b></div>
     <div class="coin wide"><span>${Math.round(r65.age)}歳のお金の幅（今の価値）</span><b>${fmt(r65.lo/dv)} 〜 ${fmt(r65.hi/dv)}</b></div>`;
   if(sStageSel===null||!DEC.some(x=>x.d===sStageSel))sStageSel=(DEC.find(x=>x.st!=="ok")||DEC[0]||{}).d??null;
-  document.getElementById("sStages").innerHTML=DEC.map((x,i)=>`<button type="button" class="stg ${x.d===sStageSel?"sel":""}" data-stg="${x.d}"><div class="no">STAGE ${i+1}</div><div class="nm">${x.d}代</div><div class="st">${stars(x.st)}</div><div class="mn">${fmt(x.to)}</div></button>`).join("");
+  document.getElementById("sStages").innerHTML=DEC.map((x,i)=>`<button type="button" class="stg ${x.d===sStageSel?"sel":""}" data-stg="${x.d}"><div class="no">STAGE ${i+1}</div><div class="nm">${x.d}代</div><div class="st">${stars(x.st)}</div><div class="mn">${fmt(x.to)}</div><div style="font-size:10.5px;color:var(--sec);margin-top:2px">${Math.round(x.a1)}歳時点の資産</div></button>`).join("");
   const sel=DEC.find(x=>x.d===sStageSel);
   {const hasSpouse=!!(S.v.spName||S.v.spBirth||num(S.v.spouse)>0||num(S.v.wPension)>0||num(S.v.wWorkTo)>0);
    if(sel){const yrs=rows.filter(r=>r.age>=sel.a0&&r.age<=sel.a1);
@@ -1233,7 +1237,7 @@ function renderSInput(){const box=document.getElementById("sform");if(!box)retur
   h+=card("🧑","あなた",sT("myName","名前","text","")+sT("myBirth","生年月日","date","入れると年齢を自動で計算")+sF("age","年齢","歳","",[20,70,1])+sF("gross","年収（額面）","万円","ボーナス込み・税金が引かれる前",[0,2000,10])+`<div class="pnote" id="sNetInfo" style="margin:0 0 8px"></div>`+((S.raises||[]).length<=1?sF("raiseSimple","昇給率（毎年）","%","くわしい入力で期間ごとに変えられます",[-5,10,.5]):`<div class="pnote" style="margin:0 0 8px">昇給：${raisePreview().split("。")[0]}（くわしい入力で変更）</div>`)+sF("retireAge","退職する年齢","歳","",[50,75,1])+sF("severance","退職金の見込み","万円","分からなければ0",[0,5000,50])+(S.v.pensionAuto!==false?`<div class="sfld"><div class="top"><div class="lb">年金の見込み（月）<small>年収と働く期間から自動で計算（今の価値）</small></div><b id="sPens" style="font:18px DotGothic16,monospace"></b></div></div>`:sF("pension","年金の見込み（月）","万円","ねんきん定期便の金額が目安",[0,40,.5])));
   h+=card("💑","配偶者",sT("spName","名前","text","")+sT("spBirth","生年月日","date","入れると年齢を自動で計算")+sF("wAge","配偶者の年齢","歳","",[20,70,1])+sF("spouse","配偶者の今の年収","万円","いない・専業主婦（夫）なら0",[0,1500,10])+sF("wReturn","これから働き始めるのは","年後","予定がなければ0",[0,20,1])+sF("wFuture","働き始めた後の年収","万円","パートなら100万前後、正社員なら300万〜など",[0,1500,10])+sF("wWorkTo","何歳まで働くか","歳","",[40,75,1])+sF("wEmpYears","これまで会社員だった年数","年","年金の自動計算に使います",[0,45,1])+sF("wPastIncome","その頃の年収","万円","",[0,1000,10]));
   const n=S.children.length;
-  h+=card("👶","子ども",`<div class="chips">${[0,1,2,3,4].map(i=>`<button type="button" class="chip ${i===n?"on":""}" data-kids="${i}">${i}人</button>`).join("")}</div>`+S.children.map((c,i)=>`<div style="border-top:2.5px dashed var(--sep);margin-top:10px;padding-top:4px"></div>`+sT("kname"+i,`${i+1}人目の名前`,"text","")+sT("kbirth"+i,"生年月日（出産予定日）","date","入れると年齢を自動で計算")+sF("kid"+i,`${i+1}人目の年齢`,"歳","生まれる予定なら −1",[-1,22,1])+(num(c.age)<6?sF("c_care_"+i,"保育料・幼稚園代（月）","万円","無償化の年齢からは自動で0円",[0,15,.5]):"")+sS("c_hs_"+i,"高校",["公立","私立"])+sS("c_univ_"+i,"大学",UNIV)+(c.univ!=="進学しない"?sF("c_csend_"+i,"仕送り（月）","万円","一人暮らしをする場合。なければ0",[0,20,.5]):"")).join("")+`<p class="pnote" style="margin:8px 0 0">教育費・入学金・児童手当は自動で計算するよ。</p>`);
+  h+=card("👶","子ども",`<div class="chips">${[0,1,2,3,4].map(i=>`<button type="button" class="chip ${i===n?"on":""}" data-kids="${i}">${i}人</button>`).join("")}</div>`+S.children.map((c,i)=>`<div style="border-top:2.5px dashed var(--sep);margin-top:10px;padding-top:4px"></div>`+sT("kname"+i,`${i+1}人目の名前`,"text","")+sT("kbirth"+i,"生年月日（出産予定日）","date","入れると年齢を自動で計算")+sF("kid"+i,`${i+1}人目の年齢`,"歳","生まれる予定なら −1",[-1,22,1])+(num(c.age)<6?sF("c_care_"+i,"保育料・幼稚園代（月）","万円","無償化の年齢からは自動で0円",[0,15,.5]):"")+sS("c_hs_"+i,"高校",["公立","私立"])+sS("c_univ_"+i,"大学",UNIV)+(c.univ!=="進学しない"?sS("c_grad_"+i,"大学院",Object.keys(GRAD_Y))+((c.grad&&c.grad!=="進学しない")?sS("c_gradType_"+i,"大学院の種類",["国立","私立"]):""):"")+(c.univ!=="進学しない"?sF("c_csend_"+i,"仕送り（月）","万円","一人暮らしをする場合。なければ0",[0,20,.5]):"")).join("")+`<p class="pnote" style="margin:8px 0 0">教育費・入学金・児童手当は自動で計算するよ。</p>`);
   h+=card("🏠","住まい",sF("house","住居費（月）","万円","家賃、またはローン返済＋管理費",[0,40,.5])+sF("loanBal","ローンの残り","万円","ローンがなければ0",[0,8000,50])+sF("loanEndAge","完済予定の年齢","歳","",[30,85,1])+sF("loanRate","金利","%","",[0,5,.05])+sF("loanBonus","ボーナス払い（1回あたり）","万円","なければ0",[0,100,1])+sS("loanBonusM1","ボーナス払いの月（1回目）",[["0","なし"],...Array.from({length:12},(_,i)=>[String(i+1),(i+1)+"月"])])+sS("loanBonusM2","ボーナス払いの月（2回目）",[["0","なし"],...Array.from({length:12},(_,i)=>[String(i+1),(i+1)+"月"])])+sS("region","お住まいの地域",Object.keys(REGIONS),"保育料の無償化・手当に影響")+sLink(`追加のローン（${(S.loans||[]).length}件）・一括購入（${(S.purchases||[]).length}件）を入力`,"住まい・ローン"));
   h+=card("🍙","くらし",sF("livingSum","生活費（住居費以外・月）","万円","食費・光熱費・通信費・保険など",[0,80,.5])+sF("special","年に数回の出費（年）","万円","旅行・車検・税金など",[0,300,5])+sLink(`これからの大きな出費・臨時収入（${(S.events||[]).length}件）を入力`,"支出・貯蓄"));
   h+=card("💰","お金",sF("cash","預貯金","万円","",[0,5000,10])+sF("investSum","投資（株・投資信託）","万円","",[0,5000,10])+sF("invest","毎月の積立投資","万円","つみたてNISAなど",[0,30,.5])+sF("dc","iDeCo・企業型DC","万円","",[0,3000,10])+sF("dcMonthly","iDeCoの毎月の掛金","万円","",[0,7,.1])+sF("saveRate","実際に貯まる割合","%","手取りのうち、1年で貯金に回せている割合",[-20,60,1]));

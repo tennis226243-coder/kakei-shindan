@@ -1,6 +1,6 @@
 // 画面（HTML）はネットを優先し、3秒で返事がなければ端末に保存した版で開く。
 // Firebaseの部品・フォント・アイコンなどは端末に保存した版をすぐ使い、裏で新しい版に更新する。
-const CACHE="kakei-v22";
+const CACHE="kakei-v23";
 const CORE=["./","./manifest.webmanifest","./firebase-config.js","./firebase-bridge.js","./apple-touch-icon.png","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>{e.waitUntil(caches.open(CACHE).then(c=>Promise.all(CORE.map(u=>c.add(u).catch(()=>{})))));self.skipWaiting()});
 self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

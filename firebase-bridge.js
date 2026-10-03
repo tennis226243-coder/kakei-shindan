@@ -2,6 +2,8 @@
 (function(){
   const q=new URLSearchParams(location.search);
   window.PENDING_JOIN=q.get("join")||null;
+  // 招待コードを読み取ったら、アドレスから ?join=… を消す（ブックマークや共有に招待コードが残らないように）
+  if(window.PENDING_JOIN){try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}}
   window.APP_URL_OVERRIDE=location.origin+location.pathname;
   const C=window.FIREBASE_CONFIG||{};
   if(!window.firebase||!C.apiKey||!C.projectId){return} // 設定がなければこの端末だけで動く

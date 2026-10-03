@@ -1725,9 +1725,17 @@ function bindQrScan(root){(root||document).querySelectorAll("[data-qrscan]").for
 function dataTools(){return `<div class="gh">データの管理</div><div class="group">
   <div class="row tap" role="button" tabindex="0" id="expData">⬇️ この家計のデータを書き出す（バックアップ）</div>
   <label class="row tap" style="cursor:pointer">⬆️ 書き出したデータを読み込む<input type="file" accept="application/json,.json" id="impData" hidden></label>
+  ${window.FB_MODE?`<div class="row tap" role="button" tabindex="0" id="shareApp">📤 このアプリを紹介する（入力値は共有されません）</div>`:""}
+  <div class="row tap" role="button" tabindex="0" id="resetDev">🧹 この端末の入力をクリアする（家計のデータは残す）</div>
   <div class="row tap danger" role="button" tabindex="0" id="delData">この家計のデータをすべて削除する</div></div>
-  <div class="gh">ご利用にあたって</div><div class="group"><div class="row"><div class="lbl"><small>・この診断は、公的な統計と計算式にもとづく目安です。将来の結果を保証するものではなく、特定の金融商品の購入や投資をすすめるものでもありません。<br>・大きな判断（住宅・保険・投資など）は、ファイナンシャルプランナーなどの専門家にも相談してください。<br>・入力したデータは、この家計の招待コードを知っている家族だけが見られる形で保存されます。書き出したデータは、ご自身で安全に保管してください。<br>・「すべて削除」を行うと、入力内容・保存した結果・家計簿・実績が消え、元に戻せません。</small></div></div></div>`}
-function bindDataTools(){const ex=document.getElementById("expData");if(ex)act(ex,()=>{const blob=JSON.stringify({app:"lifeplan",ver:2,at:new Date().toISOString(),state:pack()},null,1);
+  <div class="gh">ご利用にあたって</div><div class="group"><div class="row"><div class="lbl"><small>・この診断は、公的な統計と計算式にもとづく目安です。将来の結果を保証するものではなく、特定の金融商品の購入や投資をすすめるものでもありません。<br>・大きな判断（住宅・保険・投資など）は、ファイナンシャルプランナーなどの専門家にも相談してください。<br>・入力したデータは、この家計の招待コードを知っている家族だけが見られる形で保存されます。書き出したデータは、ご自身で安全に保管してください。<br>・「この端末の入力をクリア」は、この端末から入力内容を消して家計から抜けるだけで、家族の端末や家計のデータは消えません。招待コードを入れればまた戻れます。<br>・「すべて削除」を行うと、家族全員の入力内容・保存した結果・家計簿・実績が消え、元に戻せません。</small></div></div></div>`}
+function bindDataTools(){
+  const sa=document.getElementById("shareApp");if(sa)act(sa,async()=>{const url=APP_URL;try{if(navigator.share){await navigator.share({title:"家計の健康診断",url});return}}catch(e){return}try{await navigator.clipboard.writeText(url);toast("アプリのURLをコピーしました")}catch(e){toast(url)}});
+  const rd=document.getElementById("resetDev");if(rd){let arm=false;act(rd,async()=>{if(!arm){arm=true;rd.textContent="もう一度タップでこの端末をクリア";setTimeout(()=>{arm=false;rd.textContent="🧹 この端末の入力をクリアする（家計のデータは残す）"},4000);return}
+    try{if(SH.db&&SH.uid)await SH.db.doc(`data/users/${SH.uid}/household`).delete().catch(()=>{})}catch(e){}
+    try{Object.keys(localStorage).filter(k=>k.startsWith("lifeplan")).forEach(k=>localStorage.removeItem(k))}catch(e){}
+    if(SH.unsub){try{SH.unsub()}catch(e){}SH.unsub=null}SH.hid=null;SH.doc=null;SH.on=false;ALT_MODE=false;MAIN_SAVE=null;B0_LOCK=null;S=defaults();
+    toast("この端末の入力をクリアしました");startSetup(true)})}const ex=document.getElementById("expData");if(ex)act(ex,()=>{const blob=JSON.stringify({app:"lifeplan",ver:2,at:new Date().toISOString(),state:pack()},null,1);
     if(!window.claude){try{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([blob],{type:"application/json"}));a.download=`家計の健康診断_${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();toast("データを書き出しました");return}catch(e){}}const el=document.getElementById("impData");
     try{navigator.clipboard.writeText(blob).then(()=>toast("データをコピーしました。メモアプリなどに貼り付けて保管してください"),()=>toast("コピーできませんでした"))}catch(e){toast("コピーできませんでした")}});
   const im=document.getElementById("impData");if(im)im.addEventListener("change",async()=>{const f=im.files&&im.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!d.state)throw 0;S=unpack(d.state);persist();renderForm();calc();toast("データを読み込みました")}catch(e){toast("読み込めませんでした")}im.value=""});

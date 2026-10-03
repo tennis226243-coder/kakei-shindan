@@ -11,11 +11,14 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="firebase-config.js"></script>
-<script src="firebase-bridge.js"></script>
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firestore.googleapis.com">
+<script>window.FB_WAIT=new Promise(r=>{window.__fbr=r});</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+<script src="firebase-config.js" defer></script>
+<script src="firebase-bridge.js" defer></script>
 <title>家計の健康診断</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
@@ -285,6 +288,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
 </style>
 </head>
 <body>
+<div id="bootMsg" style="position:fixed;inset:0;display:grid;place-items:center;font:16px -apple-system,sans-serif;color:#8a8a8e;background:#fff;z-index:9999">読み込み中…</div>
 
 <section class="view" id="v-diag">
   <h1>診断</h1>
@@ -770,6 +774,7 @@ function calcLight(){LIGHT=true;try{calc()}finally{LIGHT=false}clearTimeout(HT);
 // 起動直後は軽い計算だけで画面を出し、重い計算（確率・必要な節約額・比較プラン）は少し後に1回だけ行う
 function calc(){if(BOOT&&!QUIET&&!LIGHT&&!CMP_SKIP){LIGHT=true;try{calcCore()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>{BOOT=false;calc()},900);return}calcCore()}
 function calcCore(){
+  {const bm=document.getElementById("bootMsg");if(bm&&!QUIET)bm.remove()}
   applyBirthdays();
   const v={};for(const k in S.v)v[k]=typeof S.v[k]==="boolean"?S.v[k]:((k==="region"||k==="dcMethod"||k==="saveMode"||k==="raiseMode"||k==="maintMode"||k==="myName"||k==="spName"||k==="myBirth"||k==="spBirth")?S.v[k]:(k==="netOverride"&&String(S.v[k]).trim()===""?null:num(S.v[k])));
   v.age=Math.round(v.age);v.wAge=Math.round(v.wAge);
@@ -1637,6 +1642,7 @@ async function joinHousehold(hid,fresh){
 }
 async function createHousehold(){const hid=newCode();await joinHousehold(hid,true);return hid}
 (async()=>{try{
+  if(window.FB_WAIT){try{await Promise.race([window.FB_WAIT,new Promise(r=>setTimeout(r,5000))])}catch(e){}}
   if(!window.claude||!claude.use){setTimeout(afterInit,0);return}
   const[db,user]=await Promise.all([claude.use("db"),claude.use("user")]);if(!db){setTimeout(afterInit,0);return}
   SH.db=db;SH.user=user;SH.uid=user?await user.id():null;
@@ -1718,7 +1724,7 @@ document.getElementById("wizGo").addEventListener("click",async()=>{const btn=do
 document.getElementById("wizCancel").addEventListener("click",()=>endSetup());
 
 /* ---- 共有 ---- */
-const APP_URL=window.APP_URL_OVERRIDE||"https://claude.ai/artifact/VAovoLTcQ4SD8BCxdyjdXK";
+const APP_URL_FN=()=>window.APP_URL_OVERRIDE||"https://claude.ai/artifact/VAovoLTcQ4SD8BCxdyjdXK";
 // QRコードの写真から招待コードを読み取る
 function qrScanUI(){return `<div class="group" style="margin-top:8px"><label class="row tap" style="cursor:pointer">📷 QRコードを撮影して読み取る<input type="file" accept="image/*" capture="environment" data-qrscan hidden></label></div>`}
 function bindQrScan(root){(root||document).querySelectorAll("[data-qrscan]").forEach(inp=>inp.addEventListener("change",async()=>{const f=inp.files&&inp.files[0];if(!f)return;
@@ -1734,7 +1740,7 @@ function dataTools(){return `<div class="gh">データの管理</div><div class=
   <div class="row tap danger" role="button" tabindex="0" id="delData">この家計のデータをすべて削除する</div></div>
   <div class="gh">ご利用にあたって</div><div class="group"><div class="row"><div class="lbl"><small>・この診断は、公的な統計と計算式にもとづく目安です。将来の結果を保証するものではなく、特定の金融商品の購入や投資をすすめるものでもありません。<br>・大きな判断（住宅・保険・投資など）は、ファイナンシャルプランナーなどの専門家にも相談してください。<br>・入力したデータは、この家計の招待コードを知っている家族だけが見られる形で保存されます。書き出したデータは、ご自身で安全に保管してください。<br>・「この端末の入力をクリア」は、この端末から入力内容を消して家計から抜けるだけで、家族の端末や家計のデータは消えません。招待コードを入れればまた戻れます。<br>・「すべて削除」を行うと、家族全員の入力内容・保存した結果・家計簿・実績が消え、元に戻せません。</small></div></div></div>`}
 function bindDataTools(){
-  const sa=document.getElementById("shareApp");if(sa)act(sa,async()=>{const url=APP_URL;try{if(navigator.share){await navigator.share({title:"家計の健康診断",url});return}}catch(e){return}try{await navigator.clipboard.writeText(url);toast("アプリのURLをコピーしました")}catch(e){toast(url)}});
+  const sa=document.getElementById("shareApp");if(sa)act(sa,async()=>{const url=APP_URL_FN();try{if(navigator.share){await navigator.share({title:"家計の健康診断",url});return}}catch(e){return}try{await navigator.clipboard.writeText(url);toast("アプリのURLをコピーしました")}catch(e){toast(url)}});
   const rd=document.getElementById("resetDev");if(rd){let arm=false;act(rd,async()=>{if(!arm){arm=true;rd.textContent="もう一度タップでこの端末をクリア";setTimeout(()=>{arm=false;rd.textContent="🧹 この端末の入力をクリアする（家計のデータは残す）"},4000);return}
     try{if(SH.db&&SH.uid)await SH.db.doc(`data/users/${SH.uid}/household`).delete().catch(()=>{})}catch(e){}
     try{Object.keys(localStorage).filter(k=>k.startsWith("lifeplan")).forEach(k=>localStorage.removeItem(k))}catch(e){}
@@ -1771,7 +1777,7 @@ async function renderShare(){const box=document.getElementById("shareBox");if(!b
       <div class="row tap" role="button" tabindex="0" id="joinBtn">このコードの家計に移る</div>
       <div class="row tap" role="button" tabindex="0" id="newHh">新しい家計を一から作る</div></div>
     <p class="gf">移ったり新しく作ったりしても、今の家計のデータは消えません。コードを入力すれば戻れます。</p>`+dataTools();bindDataTools();
-  try{const qb=document.getElementById("qrBox");qb.innerHTML="";if(window.QRCode){new QRCode(qb,{text:APP_URL+"?join="+SH.hid,width:180,height:180,correctLevel:QRCode.CorrectLevel.M});const im=qb.querySelector("img");if(im)im.style.cssText="background:#fff;padding:8px;border-radius:10px"}else qb.innerHTML=`<small style="color:var(--sec)">QRコードを表示できませんでした</small>`}catch(e){}
+  try{const qb=document.getElementById("qrBox");qb.innerHTML="";if(window.QRCode){new QRCode(qb,{text:APP_URL_FN()+"?join="+SH.hid,width:180,height:180,correctLevel:QRCode.CorrectLevel.M});const im=qb.querySelector("img");if(im)im.style.cssText="background:#fff;padding:8px;border-radius:10px"}else qb.innerHTML=`<small style="color:var(--sec)">QRコードを表示できませんでした</small>`}catch(e){}
   document.getElementById("copyCode").addEventListener("click",async()=>{const t=fmtCode(SH.hid);try{await navigator.clipboard.writeText(t);toast("コピーしました")}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById("codeTxt"));const sl=getSelection();sl.removeAllRanges();sl.addRange(r);toast("コードを選択しました。長押しでコピーできます")}});
   act(document.getElementById("joinBtn"),joinByCode);bindQrScan(box);
   let arm=false;act(document.getElementById("newHh"),()=>{const el=document.getElementById("newHh");if(!arm){arm=true;el.textContent="もう一度タップで作成（今の家計は残ります）";setTimeout(()=>{arm=false;el.textContent="新しい家計を一から作る"},3000);return}

@@ -17,10 +17,10 @@
 <script src="firebase-config.js"></script>
 <script src="firebase-bridge.js"></script>
 <title>家計の健康診断</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=M+PLUS+Rounded+1c:wght@500;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{
   --bg:#F2F2F7;--cell:#FFFFFF;--label:#000000;--sec:#8A8A8E;--sep:#C6C6C8;--fill:#E9E9EE;
@@ -765,9 +765,11 @@ function ageFrom(b,frac){if(!b)return null;const d=new Date(b+"T00:00:00");if(is
   if(frac)return Math.round((n-d)/(365.2425*864e5)*10)/10;let a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a}
 function applyBirthdays(){const a=ageFrom(S.v.myBirth);if(a!=null)S.v.age=String(a);const w=ageFrom(S.v.spBirth);if(w!=null)S.v.wAge=String(w);
   (S.children||[]).forEach(c=>{const x=ageFrom(c.cbirth,true);if(x!=null)c.age=String(x)})}
-let QUIET=false,LIGHT=false,HT=null;const HC={reqCut:null,reqRows:null,mcProb:null,mcP:{}};
+let QUIET=false,LIGHT=false,HT=null,BOOT=true;const HC={reqCut:null,reqRows:null,mcProb:null,mcP:{}};
 function calcLight(){LIGHT=true;try{calc()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>calc(),700)}
-function calc(){
+// 起動直後は軽い計算だけで画面を出し、重い計算（確率・必要な節約額・比較プラン）は少し後に1回だけ行う
+function calc(){if(BOOT&&!QUIET&&!LIGHT&&!CMP_SKIP){LIGHT=true;try{calcCore()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>{BOOT=false;calc()},900);return}calcCore()}
+function calcCore(){
   applyBirthdays();
   const v={};for(const k in S.v)v[k]=typeof S.v[k]==="boolean"?S.v[k]:((k==="region"||k==="dcMethod"||k==="saveMode"||k==="raiseMode"||k==="maintMode"||k==="myName"||k==="spName"||k==="myBirth"||k==="spBirth")?S.v[k]:(k==="netOverride"&&String(S.v[k]).trim()===""?null:num(S.v[k])));
   v.age=Math.round(v.age);v.wAge=Math.round(v.wAge);

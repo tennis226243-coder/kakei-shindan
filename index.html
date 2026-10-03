@@ -271,6 +271,17 @@ body.setup .view{padding-top:12px!important}
 .fpager{display:flex;justify-content:space-between;margin:18px 16px 0}
 .fpb{border:1px solid var(--sep);background:var(--cell);color:var(--tint);font:inherit;font-size:14px;padding:9px 14px;border-radius:12px;cursor:pointer}
 .lmonth{display:flex;align-items:center;justify-content:space-between;margin:4px 16px 10px}.lmonth b{font-size:18px}
+.planbar{margin:8px 16px 12px;padding:10px 12px;border-radius:14px;background:var(--cell);border:1px solid var(--sep);display:flex;flex-direction:column;gap:6px}
+.planbar.alt{background:#FFF1DC;border-color:#FF9500}
+@media (prefers-color-scheme: dark){.planbar.alt{background:#3A2A12}}
+.planbar small{font-size:12px;color:var(--sec)}
+.pbb{border:1px dashed var(--tint);background:transparent;color:var(--tint);font:inherit;font-size:14px;padding:10px;border-radius:10px;cursor:pointer}
+.pseg{display:flex;background:var(--fill);border-radius:10px;padding:2px}
+.pseg button{flex:1;border:0;background:transparent;font:inherit;font-size:14px;padding:8px;border-radius:8px;color:var(--label);cursor:pointer}
+.pseg button.on{background:var(--cell);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.planbar.alt .pseg button.on{background:#FF9500;color:#fff}
+.pacts{display:flex;gap:6px;flex-wrap:wrap}.pacts button{border:1px solid var(--sep);background:var(--cell);font:inherit;font-size:12px;padding:6px 10px;border-radius:999px;cursor:pointer;color:var(--label)}
+body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
 </style>
 </head>
 <body>
@@ -286,6 +297,8 @@ body.setup .view{padding-top:12px!important}
   <div class="gh">支出を同じ年収の世帯と比べる</div>
   <div class="group" id="cmpBox"></div>
   <p class="gf" id="cmpNote"></p>
+  <div class="gh" id="dPlanCmpH" hidden>現状と比較プランの比較</div>
+  <div class="group" id="dPlanCmp" hidden></div>
   <div class="gh">もしもの比較</div>
   <div class="group"><div id="scenBox"><div class="row"><div class="lbl">今の計画と「もしも」を並べて比べます<small>昇給が低い・金利上昇・私立進学・貯まる割合・運用悪化・世帯主の万一・働けなくなる</small></div></div></div><div class="row tap" role="button" tabindex="0" data-scen="1">もしもの比較を表示 ▾</div></div>
   <div class="gh">診断結果（10年ごと）</div>
@@ -412,6 +425,8 @@ body.setup .view{padding-top:12px!important}
   <div class="coins" id="sCoins"></div></div>
   <h2><span class="tag">CHECK</span>同じ年収の家庭と比べると？</h2>
   <div class="pbox" id="sCmpBox"></div>
+  <h2 id="sPlanCmpH" hidden><span class="tag">VS</span>現状と比較プラン</h2>
+  <div class="pbox" id="sPlanCmp" hidden></div>
   <h2><span class="tag">WHAT IF</span>もしもの比較</h2>
   <div class="pbox"><div id="sScenBox" class="stgtip" style="margin:0">今の計画と「もしも」を並べて比べるよ。</div><button type="button" class="pbtn alt" data-scen="1" style="margin:10px 0 0;width:100%">もしもの比較を表示 ▾</button></div>
   <h2><span class="tag">TOTAL</span>これからのお金の合計</h2>
@@ -552,13 +567,13 @@ const num=x=>{if(typeof x==="number")return x;const n=parseFloat(String(x??"").r
 function r1(x){return Math.round(x*10)/10}
 let S=defaults();
 try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.v){const d=defaults();
-  S={actuals:s.actuals||[],baseline:s.baseline||null,ledger:s.ledger||[],ledgerCat:s.ledgerCat||"food",purchases:s.purchases||[],v:{...d.v,...s.v},raises:s.raises||d.raises,children:(s.children||d.children).map((c,i)=>({...LISTS.children.make(),indep:i===0&&num(c.extra)===0?"3":"0",...c})),loans:s.loans||[],events:s.events||d.events};
+  S={alt:s.alt||null,actuals:s.actuals||[],baseline:s.baseline||null,ledger:s.ledger||[],ledgerCat:s.ledgerCat||"food",purchases:s.purchases||[],v:{...d.v,...s.v},raises:s.raises||d.raises,children:(s.children||d.children).map((c,i)=>({...LISTS.children.make(),indep:i===0&&num(c.extra)===0?"3":"0",...c})),loans:s.loans||[],events:s.events||d.events};
   if(!s.raises&&s.v.raiseNext!=null){const Y=new Date().getFullYear();S.raises=[{rfrom:String(Y+1),rto:String(Y+1),rrate:String(s.v.raiseNext)},{rfrom:String(Y+2),rto:String(Y+55-num(s.v.age)),rrate:String(s.v.raiseLater??2)}]}
   if(s.v.saveRate==null&&s.v.actualSave!=null)S.v._legacySave=s.v.actualSave;
   if(!s.noCarDefault){S.events=S.events.filter(e=>!(e.ename==="車の買い替え"&&String(e.ecost)==="250"&&String(e.eevery)==="10"));}
   S.events=fixCare(S.events);if(!s.noRepairDefault){S.events=S.events.filter(e=>!(e.ename==="住まいの修繕・家電"&&String(e.ecost)==="100"&&String(e.eevery)==="10"));}
   if(num(s.v.pension)>=50)S.v.pension=r1(num(s.v.pension)/12);if(num(s.v.wPension)>=40)S.v.wPension=r1(num(s.v.wPension)/12);}}catch(e){}
-const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify({...S,noCarDefault:true,noRepairDefault:true,setupDone:true}))}catch(e){};if(typeof pushShared==="function")pushShared();};
+const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify({...storeObj(),noCarDefault:true,noRepairDefault:true,setupDone:true}))}catch(e){};if(typeof pushShared==="function")pushShared();};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 function cell(key,label,val,unit,hint,attr){
@@ -809,10 +824,14 @@ function calc(){
   NOW_FLOW={net,spend:net-v.actualSave,gross:v.gross,input:planAnnual};
   // 基本生活費（今）＝ 今の年間支出（手取り＋手当−実際に貯まる額）− 住宅ローン等の返済 − 今の保育料・学費
   const eduNow=kids.reduce((s,k)=>s+(k.age>=6?edu(k.age,k):0),0);
-  const B0=Math.max(0,(net-v.actualSave)-v.loanAnnual-loans.reduce((s,L)=>s+L.payInYear(1),0)-careNow*12-eduNow);
+  let B0=Math.max(0,(net-v.actualSave)-v.loanAnnual-loans.reduce((s,L)=>s+L.payInYear(1),0)-careNow*12-eduNow);
+  // 比較プランでは「今の生活費」は現状プランと同じとし、支出の内訳・年に数回の出費・貯まる割合を変えた分だけ増減させる
+  {const brk=["food","util","misc","comm","gas","ins","other"].reduce((t,k)=>t+v[k],0);
+   if(B0_LOCK){B0=Math.max(0,B0_LOCK.b0-(v.saveRate-B0_LOCK.sr)/100*B0_LOCK.net+(brk-B0_LOCK.brk)*12+(v.special-B0_LOCK.sp))}
+   else MAIN_INFO={b0:B0,sr:v.saveRate,net,brk,sp:v.special}}
   const kidNow=kids.reduce((s,k)=>s+kidLive(k.age,k),0),adult0=Math.max(B0*0.4,B0-kidNow);
   B0_INFO={kidNow,adult0,e0:net-v.actualSave,loan:v.loanAnnual+loans.reduce((s,L)=>s+L.payInYear(1),0),care:careNow*12,edu:eduNow,b0:B0}; // 把握できていない支出（年額）
-  {const e=document.getElementById("b0Info");if(e&&B0_INFO){const I=B0_INFO;e.innerHTML=`<div class="lbl"><b>予想に使う「基本生活費」</b><small>今の年間支出 ${fmt(I.e0)}（手取り＋手当−実際に貯まる額）− ローン返済 ${fmt(I.loan)} − 保育料 ${fmt(I.care)} − 学費 ${fmt(I.edu)} ＝ 年 ${fmt(I.b0)}（月${r1(I.b0/12)}万円）。このうち子どもの生活費（統計の目安）${fmt(I.kidNow)}を除いた大人の生活費 年${fmt(I.adult0)}を物価上昇に合わせて増やし、子どもの生活費は年齢に合わせて（未就学58万・小学生70万・中学生87万・高校生101万／年）、独立すると0にします。上の内訳は家計簿の予算と比較に使います</small></div>`}}
+  {const e=document.getElementById("b0Info");if(e&&B0_INFO){const I=B0_INFO;e.innerHTML=`<div class="lbl"><b>予想に使う「基本生活費」</b><small>${B0_LOCK?`【比較プラン】今の生活費は現状プランと同じ年${fmt(B0_LOCK.b0)}とし、支出の内訳・年に数回の出費・実際に貯まる割合を変えた分だけ増減させて 年${fmt(I.b0)}。`:""}今の年間支出 ${fmt(I.e0)}（手取り＋手当−実際に貯まる額）− ローン返済 ${fmt(I.loan)} − 保育料 ${fmt(I.care)} − 学費 ${fmt(I.edu)} ＝ 年 ${fmt(I.b0)}（月${r1(I.b0/12)}万円）。このうち子どもの生活費（統計の目安）${fmt(I.kidNow)}を除いた大人の生活費 年${fmt(I.adult0)}を物価上昇に合わせて増やし、子どもの生活費は年齢に合わせて（未就学58万・小学生70万・中学生87万・高校生101万／年）、独立すると0にします。上の内訳は家計簿の予算と比較に使います</small></div>`}}
   {const e=document.getElementById("saveAmt");if(e)e.textContent=BUDGET?`「手取り−支出」で計算中：今年の余り 約${fmt(v.actualSave)}（手取りの${v.saveRate}%）。この欄の値は使いません`:`＝ 年 約${fmt(v.actualSave)}（月 約${r1(v.actualSave/12)}万円）`;}
   const rate=v.actualSave/net*100,rateAct=rate;
   PLAN_M=planAnnual/12;const emerg=v.cash/(planAnnual/12),houseRatio=(v.loanAnnual+loanPayNow)/net*100;
@@ -1158,6 +1177,11 @@ function calc(){
    const dt=document.getElementById("dTotals");if(dt)dt.innerHTML=T.map(([t,i,e],k)=>`<div class="row"><div class="lbl">${k?t:"<b>"+t+"</b>"}<small>収入 ${fmt(i)}／支出 ${fmt(e)}</small></div><div class="val" style="color:${i-e<0?"var(--red)":"var(--green)"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</div></div>`).join("")+`<div class="row"><div class="lbl"><small>${note}</small></div></div>`;
    const st=document.getElementById("sTotals");if(st)st.innerHTML=T.map(([t,i,e])=>`<div class="stat"><div class="top"><span>${t}</span><em style="color:${i-e<0?"#E0356F":"#23A04A"}">${i-e>=0?"+":"−"}${fmt(Math.abs(i-e))}</em></div><small>入ってくるお金 ${fmt(i)}／出ていくお金 ${fmt(e)}</small></div>`).join("")+`<p class="pnote" style="margin:6px 0 0">${note}</p>`;
    TOT_NOTE={T,note};}
+  if(!QUIET&&!LIGHT&&!CMP_SKIP&&(S.alt||ALT_MODE)){
+    const vv={};for(const k in S.v)vv[k]=num(S.v[k]);const cur=planSummary(rows,vv),curP=planOf(S),othP=ALT_MODE?MAIN_SAVE:S.alt,oth=planRun(othP);
+    CMP_SKIP=true;const LS=LIGHT;LIGHT=true;try{calc()}finally{CMP_SKIP=false;LIGHT=LS}
+    if(ALT_MODE)renderPlanCompare(oth,cur,othP,curP);else renderPlanCompare(cur,oth,curP,othP);return}
+  if(!QUIET&&!CMP_SKIP&&!S.alt&&!ALT_MODE)renderPlanCompare(null,null);
   try{renderSimple({level,rate,emerg,houseRatio,fin,v,shortAge,rows,DEC,A,net,reqRate,reqRows})}catch(e){console.error(e)}
 }
 /* ===== かんたん版の描画 ===== */
@@ -1342,6 +1366,53 @@ let STAT_OPEN=(()=>{try{return localStorage.getItem("lifeplan-stat")!=="0"}catch
 function renderStatToggle(){const w=document.getElementById("statWrap"),b=document.getElementById("statToggle");if(!w||!b)return;w.hidden=!STAT_OPEN;b.textContent=STAT_OPEN?"閉じる ▴":"表示する ▾";b.setAttribute("aria-expanded",STAT_OPEN)}
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("#statToggle");if(!t)return;STAT_OPEN=!STAT_OPEN;try{localStorage.setItem("lifeplan-stat",STAT_OPEN?"1":"0")}catch(x){}renderStatToggle()});
 setTimeout(renderStatToggle,0);
+/* ===== 比較プラン（現状をコピーして、一部を変えて比べる） ===== */
+var PF=["v","raises","children","loans","events","purchases"];
+var ALT_MODE=false,MAIN_SAVE=null,CMP_SKIP=false,B0_LOCK=null,MAIN_INFO=null;
+var planOf=X=>JSON.parse(JSON.stringify(Object.fromEntries(PF.map(k=>[k,X[k]===undefined?null:X[k]]))));
+function storeObj(){return ALT_MODE&&MAIN_SAVE?{...S,...MAIN_SAVE,alt:planOf(S)}:{...S}}
+function rerenderAll(){document.body.classList.toggle("alt-mode",ALT_MODE);renderForm();if(typeof renderSInput==="function")renderSInput();calc()}
+function createAlt(){S.alt=planOf(S);persist();enterAlt();toast("現状をコピーして比較プランを作りました")}
+function enterAlt(){if(ALT_MODE||!S.alt)return;B0_LOCK=MAIN_INFO;MAIN_SAVE=planOf(S);Object.assign(S,JSON.parse(JSON.stringify(S.alt)));ALT_MODE=true;rerenderAll()}
+function exitAlt(){if(!ALT_MODE)return;B0_LOCK=null;S.alt=planOf(S);Object.assign(S,JSON.parse(JSON.stringify(MAIN_SAVE)));MAIN_SAVE=null;ALT_MODE=false;persist();rerenderAll()}
+function deleteAlt(){B0_LOCK=null;if(ALT_MODE){Object.assign(S,JSON.parse(JSON.stringify(MAIN_SAVE)));MAIN_SAVE=null;ALT_MODE=false}S.alt=null;persist();rerenderAll();toast("比較プランを削除しました")}
+function adoptAlt(){B0_LOCK=null;const P=ALT_MODE?planOf(S):S.alt;if(!P)return;ALT_MODE=false;MAIN_SAVE=null;Object.assign(S,JSON.parse(JSON.stringify(P)));S.alt=null;persist();rerenderAll();toast("比較プランを現状プランにしました")}
+function planBarHTML(){if(!S.alt&&!ALT_MODE)return `<div class="planbar"><button type="button" class="pbb" data-plan="create">＋ 現状をコピーして比較プランを作る</button><small>比較プランで条件を変えると、現状との差を診断画面で比べられます</small></div>`;
+  return `<div class="planbar ${ALT_MODE?"alt":""}"><div class="pseg"><button type="button" data-plan="main" class="${ALT_MODE?"":"on"}">現状プラン</button><button type="button" data-plan="alt" class="${ALT_MODE?"on":""}">比較プラン</button></div>
+   <small>${ALT_MODE?"🟧 比較プランを編集中です。ここで変えた内容は現状プランに影響しません":"現状プランを編集中です"}</small>
+   <div class="pacts"><button type="button" data-plan="adopt">比較プランを現状にする</button><button type="button" data-plan="delete">比較プランを削除</button></div></div>`}
+function mountPlanBar(id){const box=document.getElementById(id);if(!box||!box.insertAdjacentHTML)return;const old=box.querySelector(".planbar");if(old)old.remove();box.insertAdjacentHTML("afterbegin",planBarHTML())}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-plan]");if(!t)return;const a=t.dataset.plan;
+  if(a==="create")createAlt();else if(a==="alt")enterAlt();else if(a==="main")exitAlt();
+  else if(a==="delete"){if(t.dataset.arm){deleteAlt()}else{t.dataset.arm=1;t.textContent="もう一度タップで削除";setTimeout(()=>{delete t.dataset.arm;t.textContent="比較プランを削除"},3000)}}
+  else if(a==="adopt"){if(t.dataset.arm){adoptAlt()}else{t.dataset.arm=1;t.textContent="もう一度タップで現状を置き換え";setTimeout(()=>{delete t.dataset.arm;t.textContent="比較プランを現状にする"},3000)}}});
+function planSummary(rows,v){const dv=x=>Math.pow(1+v.infl/100,x.age-v.age),fl=rows.slice(1),ret=v.retireAge;
+  const r65=rows.find(r=>Math.round(r.age)===65)||rows[rows.length-1],rE=rows[rows.length-1],sh=rows.find(r=>r.fin<0);
+  const sm=(a,f)=>a.reduce((t,x)=>t+f(x)/dv(x),0),rt=fl.filter(x=>x.age>ret);
+  return{f65:r65.fin/dv(r65),fEnd:rE.fin/dv(rE),short:sh?Math.round(sh.age):null,inc:sm(fl,x=>x.inc),spend:sm(fl,x=>x.spend),retGap:sm(rt,x=>x.spend-x.inc),minLiq:Math.min(...rows.map(r=>(r.cash+(r.invA||0))/dv(r))),series:rows.map(r=>({age:r.age,fin:r.fin}))}}
+function planRun(P){const S0=S,gE=document.getElementById,gQ=document.querySelectorAll,AM=ALT_MODE,L0=B0_LOCK;let out=null;B0_LOCK=AM?null:MAIN_INFO;
+  const dummy={innerHTML:"",textContent:"",value:"",hidden:false,style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},setAttribute(){},querySelector:()=>null,querySelectorAll:()=>[],contains:()=>false,after(){},insertAdjacentHTML(){}};
+  try{document.getElementById=()=>dummy;document.querySelectorAll=()=>[];QUIET=true;S={...JSON.parse(JSON.stringify(S0)),...JSON.parse(JSON.stringify(P))};calc();
+    const v={};for(const k in S.v)v[k]=num(S.v[k]);out=planSummary(CH.chart.rows,v)}
+  catch(e){out=null}finally{document.getElementById=gE;document.querySelectorAll=gQ;QUIET=false;S=S0;ALT_MODE=AM;B0_LOCK=AM?MAIN_INFO:L0}return out}
+function planDiff(A,B){const FD={};FIELDS.forEach(([,it])=>it.forEach(f=>FD[f[0]]=f[1]));const out=[];
+  for(const k in Object.assign({},A.v,B.v)){if(k.startsWith("_"))continue;const a=A.v[k],b=B.v[k];if(String(a??"")!==String(b??"")&&FD[k])out.push(`${FD[k]}：${a===true?"オン":a===false?"オフ":a??"—"} → ${b===true?"オン":b===false?"オフ":b??"—"}`)}
+  const L={children:"子どもの設定",raises:"昇給の予定",loans:"追加のローン",events:"ライフイベント",purchases:"一括購入"};
+  for(const k in L)if(JSON.stringify(A[k]||[])!==JSON.stringify(B[k]||[]))out.push(`${L[k]}を変更`);return out}
+function renderPlanCompare(Asum,Bsum,Ap,Bp){const boxes=[document.getElementById("dPlanCmp"),document.getElementById("sPlanCmp")];
+  const heads=[document.getElementById("dPlanCmpH"),document.getElementById("sPlanCmpH")];
+  if(!Asum||!Bsum){boxes.forEach(b=>{if(b)b.hidden=true});heads.forEach(h=>{if(h)h.hidden=true});return}
+  const row=(n,a,b,goodUp=true,isAge)=>{const d=isAge?null:b-a;const col=d==null?"":Math.abs(d)<0.5?"":((goodUp?d>0:d<0)?"var(--green)":"var(--red)");
+    return `<tr><td style="text-align:left">${n}</td><td>${isAge?(a?a+"歳":"なし"):Math.round(a).toLocaleString()}</td><td>${isAge?(b?b+"歳":"なし"):Math.round(b).toLocaleString()}</td><td style="color:${col}">${isAge?"":(d>=0?"+":"−")+Math.round(Math.abs(d)).toLocaleString()}</td></tr>`};
+  const diff=planDiff(Ap,Bp);
+  const html=`<div style="overflow-x:auto"><table class="audit"><thead><tr><th>項目（今の価値・万円）</th><th>現状</th><th>比較</th><th>差</th></tr></thead><tbody>
+    ${row("65歳時点の資産",Asum.f65,Bsum.f65)}${row("90歳時点の資産",Asum.fEnd,Bsum.fEnd)}${row("資産が底をつく年齢",Asum.short,Bsum.short,true,true)}
+    ${row("これからの収入の合計",Asum.inc,Bsum.inc)}${row("これからの支出の合計",Asum.spend,Bsum.spend,false)}${row("退職後の不足額（合計）",Asum.retGap,Bsum.retGap,false)}${row("すぐ使えるお金が最も少ない時",Asum.minLiq,Bsum.minLiq)}</tbody></table></div>
+    <div style="padding:8px 12px;font-size:12.5px;line-height:1.6"><b>比較プランで変えたところ</b><br><span style="color:var(--sec)">※比較プランでは、年収などを変えても今の生活費は現状と同じとみなします（支出の内訳・貯まる割合を変えた分だけ増減）</span><br>${diff.length?diff.map(x=>"・"+esc(x)).join("<br>"):"まだ変更はありません（入力画面で「比較プラン」に切り替えて変更してください）"}</div>
+    <div class="chart" id="planCmpChart"></div><div class="legend"><span><i style="background:var(--tint)"></i>現状</span><span><i style="background:var(--orange)"></i>比較プラン</span></div>`;
+  boxes.forEach(b=>{if(b){b.hidden=false;b.innerHTML=html}});heads.forEach(h=>{if(h)h.hidden=false});
+  const ser=Asum.series.map((x,i)=>({age:x.age,a:x.fin,b:(Bsum.series[i]||{}).fin}));
+  try{document.querySelectorAll("#planCmpChart").forEach((el,i)=>{el.id="planCmpChart"+i;drawChart(el.id,ser,[{k:"a",c:"var(--tint)",w:2.5,l:"現状"},{k:"b",c:"var(--orange)",w:2.5,l:"比較"}],{})})}catch(e){}}
 let SCEN_RES=null,SCEN_OPEN=false;const SCEN_INTRO_D=`<div class="row"><div class="lbl">今の計画と「もしも」を並べて比べます<small>昇給が低い・金利上昇・私立進学・貯まる割合・運用悪化・世帯主の万一・働けなくなる</small></div></div>`,SCEN_INTRO_S="今の計画と「もしも」を並べて比べるよ。";
 function runScenarios(){const S0=S,gE=document.getElementById,gQ=document.querySelectorAll;const res=[];
   const dummy={innerHTML:"",textContent:"",value:"",hidden:false,style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},setAttribute(){},querySelector:()=>null,querySelectorAll:()=>[],contains:()=>false,after(){}};
@@ -1396,6 +1467,9 @@ function runVerify(){const R=[],chk=(name,got,exp,tol,unit,src)=>R.push({name,go
    R.map(x=>`<div class="row"><div class="lbl"><span class="pill c-${x.ok?"ok":"ng"}"></span>${esc(x.name)}<small>${esc(x.src)}</small></div><div class="val">${typeof x.got==="number"?(Math.round(x.got*100)/100).toLocaleString():x.got}${x.unit}${x.ok?" ✓":" ✗"}</div></div>`).join("")+`<div class="row tap" role="button" tabindex="0" id="runVerify">もう一度実行する</div>`;
   const b=document.getElementById("runVerify");if(b)act(b,runVerify);TAX_AGE=num(S.v.age)}
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("#runVerify");if(t&&!t.dataset.bound){runVerify()}});
+setTimeout(()=>{const _rf=renderForm;renderForm=function(){_rf.apply(this,arguments);mountPlanBar("form")};
+  if(typeof renderSInput==="function"){const _rs=renderSInput;renderSInput=function(){_rs.apply(this,arguments);mountPlanBar("sform")}}
+  try{mountPlanBar("form");mountPlanBar("sform")}catch(e){}},0);
 let idS="mid",IDC=null;
 function renderPens(ID,v){const aBoth=Math.max(v.pensionAge,v.age+(v.wPensionAge-v.wAge),v.retireAge+1),yb=Math.round(aBoth-v.age),pgb=1,nom=Math.pow(1+v.pensionGrow/100,yb),dv=Math.pow(1+v.infl/100,yb);
    const ideM=(ID[idS][yb]?.pay||0)/12/dv;const tot=(v.pension+v.wPension)+ideM;
@@ -1513,11 +1587,11 @@ const CODE_CH="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
 const newCode=()=>{let c="";const a=new Uint32Array(12);(crypto&&crypto.getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*1e9));a.forEach(x=>c+=CODE_CH[x%CODE_CH.length]);return c};
 const fmtCode=c=>c?c.replace(/(.{4})(?=.)/g,"$1-"):"";
 const normCode=t=>String(t||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
-function pack(){return JSON.parse(JSON.stringify({v:S.v,raises:S.raises,children:S.children,loans:S.loans,purchases:S.purchases||[],events:S.events,actuals:S.actuals||[],baseline:S.baseline||null,ledger:S.ledger||[],ledgerCat:S.ledgerCat||"food"}))}
+function pack(){const M=ALT_MODE&&MAIN_SAVE?MAIN_SAVE:S;return JSON.parse(JSON.stringify({alt:ALT_MODE?planOf(S):(S.alt||null),v:M.v,raises:M.raises,children:M.children,loans:M.loans,purchases:M.purchases||[],events:M.events,actuals:S.actuals||[],baseline:S.baseline||null,ledger:S.ledger||[],ledgerCat:S.ledgerCat||"food"}))}
 const fixCare=evs=>(evs||[]).map(e=>e.ename==="介護・医療の備え"&&String(e.ecost)==="200"&&String(e.eage)==="75"?{...e,ename:"介護の費用（1人分・全国平均）",eage:"80",ecost:"542",euntil:"80"}:e);
 function unpack(d){const D=defaults();d=JSON.parse(JSON.stringify(d||{})); // 受信データは凍結されているので複製
-  const lv=d.v&&d.v.saveRate==null&&d.v.actualSave!=null?{_legacySave:d.v.actualSave}:{};return{v:{...D.v,...(d.v||{}),...lv},raises:d.raises||D.raises,children:(d.children||[]).map(c=>({...LISTS.children.make(),...c})),loans:d.loans||[],purchases:d.purchases||[],events:fixCare(d.events),actuals:d.actuals||[],baseline:d.baseline||null,ledger:d.ledger||[],ledgerCat:d.ledgerCat||"food"}}
-function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify({...S,noCarDefault:true,noRepairDefault:true,setupDone:true}))}catch(e){}}
+  const lv=d.v&&d.v.saveRate==null&&d.v.actualSave!=null?{_legacySave:d.v.actualSave}:{};return{v:{...D.v,...(d.v||{}),...lv},raises:d.raises||D.raises,children:(d.children||[]).map(c=>({...LISTS.children.make(),...c})),loans:d.loans||[],purchases:d.purchases||[],events:fixCare(d.events),alt:d.alt||null,actuals:d.actuals||[],baseline:d.baseline||null,ledger:d.ledger||[],ledgerCat:d.ledgerCat||"food"}}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify({...storeObj(),noCarDefault:true,noRepairDefault:true,setupDone:true}))}catch(e){}}
 function pushShared(){if(!SH.on||!SH.canWrite||!SH.doc)return;SH.dirty=true;clearTimeout(SH.timer);setSync("保存中…");
   SH.timerPending=true;SH.timer=setTimeout(async()=>{SH.timerPending=false;SH.rev++;const at=new Date().toISOString();
     try{await SH.doc.set({state:pack(),client:SH.client,rev:SH.rev,at,by:SH.uid});SH.by=SH.uid;SH.at=at;if(!SH.timerPending)SH.dirty=false;setSync()}
@@ -1525,6 +1599,7 @@ function pushShared(){if(!SH.on||!SH.canWrite||!SH.doc)return;SH.dirty=true;clea
 function applyRemote(d){if(!d||!d.state||d.client===SH.client)return;
   if(SH.dirty)return; // 自分の未保存の変更を優先
   if(SH.at&&d.at&&d.at<=SH.at)return; // すでに反映済み・古いデータは無視
+  if(ALT_MODE){const D=unpack(d.state);MAIN_SAVE=planOf(D);["actuals","baseline","ledger","ledgerCat"].forEach(k=>S[k]=D[k]);SH.by=d.by;SH.at=d.at;calc();setSync();return}
   S=unpack(d.state);saveLocal();
   SH.by=d.by;SH.at=d.at;const f=document.getElementById("form"),f2=document.getElementById("sform"),ae=document.activeElement;
   if(ae&&((f&&f.contains&&f.contains(ae))||(f2&&f2.contains&&f2.contains(ae))))SH.pending=true;else{renderForm();if(CUR==="v-input"&&MODE==="simple")renderSInput()}

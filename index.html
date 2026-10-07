@@ -1244,12 +1244,13 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
      const KO=S.children.map(c=>({age:num(c.age),univ:c.univ,hs:c.hs||"公立",grad:c.grad||"進学しない",gradType:c.gradType||"国立",send:num(c.csend),sendY:c.csendY==null?4:num(c.csendY),name:c.cname}));
      // 各年のひとこと：在学中の子どもの学年と学費、仕送り、その年の家計の状態
      const yComments=r=>{const y=r.age-v.age,f=Math.pow(1+v.infl/100,y),out=[];
+       if(r.inc!=null&&r.spend!=null){const d=r.inc-r.spend;out.push(`📊 収入 ${fmt(r.inc)}／支出 ${fmt(r.spend)}／<b style="color:${d<0?"#E0356F":"#23A04A"}">収支 ${d>=0?"+":"−"}${fmt(Math.abs(d))}</b>`)}
        KO.forEach((k,i)=>{const a=k.age+y,nm=k.name||"子"+(i+1),gy=gradY(k);let g=null;
          if(a>=6&&a<12)g=["小学",Math.floor(a)-5];else if(a>=12&&a<15)g=["中学",Math.floor(a)-11];else if(a>=15&&a<18)g=["高校",Math.floor(a)-14];
          else if(a>=18&&a<22&&k.univ!=="進学しない")g=["大学",Math.floor(a)-17];else if(a>=22&&a<22+gy)g=["大学院",Math.floor(a)-21];
          if(g&&g[1]>=2){const c=edu(a,k)*f,sd=k.send>0&&a>=18&&a<18+k.sendY?k.send*12:0;out.push(`📚 ${esc(nm)} ${g[0]}${g[1]}年：学費 年${Math.round(c)}万${sd?`＋仕送り 年${Math.round(sd)}万`:""}`)}});
-       if(r.save!=null){out.push(r.save>=0?`💰 この年は ${fmt(r.save)} 貯蓄できる見込み`:`⚠️ この年は ${fmt(-r.save)} を貯金から取り崩す見込み`)}
-       else{const gap=r.spend-r.inc;out.push(gap>0?`🌸 年金生活：足りない ${fmt(gap)} を資産から取り崩す`:`🌸 年金生活：収入で生活費をまかなえる`)}
+       if(r.save==null)out.push(r.spend>r.inc?"🌸 年金生活：足りない分は資産から取り崩し":"🌸 年金生活：収入で生活費をまかなえる");
+       else if(r.inc-r.spend<0)out.push("⚠️ 支出が収入を上回る年（貯金から取り崩し）");
        return out};
      const body=yrs.map(r=>{const evs=TL.filter(t=>Math.round(t.age)===Math.round(r.age)&&t.t!=="資産が最大に"),cm=yComments(r);
        const off=Math.round(r.age-v.age),PC=["#FFD23F","#FF9ACB","#8BE0FF","#A6E88F","#C9B3FF","#FFC08A"],ppl=[[S.v.myName||"自分",Math.round(r.age),PC[0]]];

@@ -399,6 +399,9 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
   <p class="gf">公表されている数値や、計算上必ず成り立つはずの関係を、このページの計算で再現できるかを確かめます。</p>
   <p class="gf">計算に入れていないもの：住民税が前年の所得にかかる時間差、社会保険料率の将来の変化、iDeCoを一時金で受け取るときの税金、生命保険の保険金、相続、介護・医療の実際の費用（ライフイベントで入力してください）。</p>
   </details>
+  <div class="gh">AIに相談する</div>
+  <div class="group"><div class="row tap" role="button" tabindex="0" data-aireport="1">🤖 ChatGPTに渡す用に、入力内容と結果をまとめる</div></div>
+  <p class="gf">名前・生年月日は含めません。年齢・金額などの入力内容と計算結果を文章にまとめ、ChatGPTなどにそのまま貼り付けられる形でコピーします。</p>
   <div class="gh">この結果を保存</div>
   <div class="group"><div class="row"><input class="memo" id="memo" type="text" placeholder="メモ（例：ボーナス後）" maxlength="40" aria-label="メモ"></div></div>
   <button class="btn" id="saveBtn" type="button">結果を保存</button>
@@ -450,7 +453,8 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
   <div id="sQuests"></div>
   <button class="pbtn" type="button" id="sSave">この結果をセーブ</button>
   <button class="pbtn alt" type="button" data-go="v-input">数字を変えてみる</button>
-  <p class="pnote" style="margin-bottom:10px">目安の計算です。計算の式と出典は「くわしい版」の診断の一番下「計算のしくみ」にすべて載せているよ。大事な判断は専門家にも相談してね。</p>
+  <button type="button" class="pbtn alt" data-aireport="1" style="margin:0 0 10px;width:100%">🤖 ChatGPTに渡す用にまとめる</button>
+<p class="pnote" style="margin-bottom:10px">目安の計算です。計算の式と出典は「くわしい版」の診断の一番下「計算のしくみ」にすべて載せているよ。大事な判断は専門家にも相談してね。</p>
 </section>
 
 <section class="view pop" id="v-sinput">
@@ -519,7 +523,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
 const END_AGE=90;
 const FIELDS=[
  ["あなた",[["myName","名前（呼び名）","","txt"],["myBirth","生年月日","","date","入れると年齢を自動で計算します"],["age","年齢",35,"歳"],["gross","年収（額面）",500,"万円","ボーナス込み・税金などが引かれる前の金額"],["retireAge","退職する年齢",65,"歳"],["severance","退職金の見込み",0,"万円","分からなければ0でOK（少なめに見積もれます）"],["pensionAuto","年金を自動で計算する",true,"chk","年収・働く期間から、厚生労働省の計算方法で見積もります"],["workStart","会社員として働き始めた年齢",22,"歳"],["stuYears","学生納付特例で払っていない期間",0,"年","20歳から卒業までの学生の期間のうち、追納していない年数（例：大学院修士卒で20〜24歳なら4）。その分、基礎年金が減ります"],["pension","年金の見込み（月額・手入力）",15,"万円","自動計算をオフにしたときに使います。ねんきん定期便の金額が目安"],["pensionAge","年金を受け取り始める年齢",65,"歳","65歳より早いと1か月0.4%減、遅いと1か月0.7%増"]],{intro:"まずは基本の情報です。"}],
- ["配偶者",[["spName","名前（呼び名）","","txt"],["spBirth","生年月日","","date","入れると年齢を自動で計算します"],["wAge","年齢",35,"歳"],["spouse","今の年収",0,"万円","専業主婦（夫）・配偶者がいない場合は0"],["wReturn","これから働き始めるのは",0,"年後","予定がなければ0"],["wFuture","働き始めた後の年収",0,"万円"],["wSaveRate","配偶者の収入のうち貯蓄に回す割合",100,"%","今より増えた配偶者の手取りのうち貯蓄に回す割合。残りは生活費が増える計算（100なら全額貯蓄）"],["wWorkTo","何歳まで働くか",60,"歳"],["wEmpYears","これまで会社員だった年数",0,"年","年金の自動計算に使います"],["wStuYears","学生納付特例で払っていない期間",0,"年","20歳以降の学生期間のうち、追納していない年数"],["wPastIncome","その頃の年収",300,"万円"],["wPension","年金の見込み（月額・手入力）",6.5,"万円","自動計算をオフにしたときに使います"],["wPensionAge","年金を受け取り始める年齢",65,"歳"]]],
+ ["配偶者",[["hasSpouse","配偶者がいる",true,"chk","いない場合はオフ（配偶者控除・配偶者の年金・加給年金を計算しません）"],["spName","名前（呼び名）","","txt"],["spBirth","生年月日","","date","入れると年齢を自動で計算します"],["wAge","年齢",35,"歳"],["spouse","今の年収",0,"万円","専業主婦（夫）・配偶者がいない場合は0"],["wReturn","これから働き始めるのは",0,"年後","予定がなければ0"],["wFuture","働き始めた後の年収",0,"万円"],["wSaveRate","配偶者の収入のうち貯蓄に回す割合",100,"%","今より増えた配偶者の手取りのうち貯蓄に回す割合。残りは生活費が増える計算（100なら全額貯蓄）"],["wWorkTo","何歳まで働くか",60,"歳"],["wEmpYears","これまで会社員だった年数",0,"年","年金の自動計算に使います"],["wStuYears","学生納付特例で払っていない期間",0,"年","20歳以降の学生期間のうち、追納していない年数"],["wPastIncome","その頃の年収",300,"万円"],["wPension","年金の見込み（月額・手入力）",6.5,"万円","自動計算をオフにしたときに使います"],["wPensionAge","年金を受け取り始める年齢",65,"歳"]]],
  ["お住まいの地域",[["region","地域","全国（国の制度のみ）","sel"]],{intro:"保育料の無償化や子どもの手当が地域によって変わります。"}],
  ["住宅ローン",[["loanBal","ローンの残り",0,"万円","返済予定表に載っている今の残高。ローンがなければ0"],["loanRate","金利",1,"%"],["loanEndAge","完済予定の年齢",70,"歳"],["loanBonus","ボーナス払い（1回あたり）",0,"万円","なければ0"],["loanBonusM1","ボーナス払いの月（1回目）","0","mon"],["loanBonusM2","ボーナス払いの月（2回目）","0","mon"],["loanDeduct","住宅ローン控除を受けている",true,"chk"],["loanDedEnd","住宅ローン控除が受けられる最後の年",0,"年","入居した年＋12年（13年間）。例：2025年入居なら2037。0なら今年から13年間とみなします"],["loanPayActual","実際の毎月の返済額（分かれば）",0,"万円","返済予定表や引き落とし額。入れるとこの額で返済し、完済は「完済予定の年齢」のままになるよう残高を合わせます（ボーナス払いは別）"],["propTax","固定資産税・都市計画税（年）",0,"万円","毎年5月ごろに届く納税通知書の年税額"],["homePrice","家の購入価格",0,"万円","持ち家の場合"],["maintMode","持ち家の維持費","今の支出に含まれている","sel","固定資産税・火災保険・修繕など。「購入価格の1%」は金融庁のシミュレーターと同じ考え方"],["shuzen","修繕積立金（月）",0,"万円","マンションの場合"],["shuzenUp","修繕積立金の値上がり（年）",2,"%","多くのマンションは段階的に上がります。30年間上がり続ける想定"]]],
  ["毎月の支出",[["food","食費",6,"万円"],["util","水道光熱費",2.5,"万円"],["house","住居費",8,"万円","家賃、またはローン返済＋管理費・修繕積立金"],["misc","日用品・雑費",3,"万円"],["comm","通信費",1,"万円"],["gas","車・交通費",1,"万円"],["ins","保険料",1,"万円"],["other","その他",3,"万円","医療・交際費・趣味など"],["special","年に数回の出費（年額）",20,"万円","旅行・車検・固定資産税など"],["saveRate","実際に貯まる割合",10,"%","手取りのうち、1年で貯金や積立に回せている割合（ボーナス込み）<span id=\"saveAmt\" style=\"display:block;color:var(--tint);font-weight:600\"></span>"]],{intro:"だいたいの金額で大丈夫です。"}],
@@ -615,7 +619,7 @@ function listHTML(name){
 }
 // くわしい入力：カテゴリーごとに整理（項目はFIELDSの定義をそのまま使う）
 const FORM=[
- {cat:"家族",icon:"👪",groups:[["あなた",["myName","myBirth","age"],"名前・生年月日を入れると年齢は自動で計算します"],["配偶者",["spName","spBirth","wAge","spouse","wReturn","wFuture","wSaveRate","wWorkTo"],"専業主婦（夫）なら年収は0"],["お住まいの地域",["region"],"保育料の無償化や子どもの手当が地域で変わります"],["子ども",[],""]]},
+ {cat:"家族",icon:"👪",groups:[["あなた",["myName","myBirth","age"],"名前・生年月日を入れると年齢は自動で計算します"],["配偶者",["hasSpouse","spName","spBirth","wAge","spouse","wReturn","wFuture","wSaveRate","wWorkTo"],"専業主婦（夫）なら年収は0"],["お住まいの地域",["region"],"保育料の無償化や子どもの手当が地域で変わります"],["子ども",[],""]]},
  {cat:"収入",icon:"💼",groups:[["あなたの収入",["raiseMode","curveBaseUp","gross","baseSalary","bonusAnnual","bonusLinked","overtime","otEndAge","netOverride"],"基本給を入れると、昇給は基本給にだけかかります"],["昇給",["raiseMonth","raiseOther","dropAge","dropRate"],""]]},
  {cat:"年金・退職",icon:"🌸",groups:[["退職",["retireAge","severance"],""],["あなたの年金",["pensionAuto","workStart","stuYears","pension","pensionAge","pensionGrow","teikiKosei"],""],["配偶者の年金",["wEmpYears","wStuYears","wPastIncome","wPension","wPensionAge"],""],["保険（万一の備え）",["lifeIns","ipMonthly","ipUntil","diMonthly","diUntil"],"世帯主の保険。もしもの比較の「万一」「働けなくなる」に使います"],["iDeCo・企業型DC",["dc","dcMonthly","dcEnd","dcStart","dcMethod","dcYears","dcRate","dcLow","dcHigh","dcDeduct"],""]]},
  {cat:"住まい・ローン",icon:"🏠",groups:[["住宅ローン",["loanBal","loanRate","loanEndAge","loanPayActual","loanBonus","loanBonusM1","loanBonusM2","loanDeduct","loanDedEnd"],""],["持ち家の維持費",["propTax","homePrice","maintMode","shuzen","shuzenUp"],"固定資産税・火災保険・修繕積立金など"],["追加のローン",[],""],["一括購入",[],""]]},
@@ -811,7 +815,7 @@ function calcCore(){
   const monthlyTotal=living+v.special/12+Math.max(0,v.loanAnnual-v.loanMonthly*12)/12;
   {const t=document.getElementById("livingTotal");if(t)t.textContent=r1(monthlyTotal)+" 万円";
    const n=document.getElementById("livingNote");if(n)n.textContent=`内訳 ${r1(living-careNow)}＋保育料 ${r1(careNow)}＋固定支出 ${r1(v.special/12)}（年${v.special}÷12）＋ボーナス払い ${r1(Math.max(0,v.loanAnnual-v.loanMonthly*12)/12)}`;}
-  const spouseDed=v.spouse<=123;
+  const spouseDed=v.hasSpouse!==false&&v.spouse<=123;
   const allowNow=kids.reduce((s,k,i)=>s+allowance1(agesNow,i),0);
   const dcDed=v.dcDeduct?v.dcMonthly*12:0;
   TAX_AGE=v.age;
@@ -895,7 +899,7 @@ function calcCore(){
     // 配偶者：基礎年金（第3号期間も含め満額と仮定）＋会社員期間の報酬比例
     let ws=v.wEmpYears*12*Math.min(v.wPastIncome/12,CAPM),wm=v.wEmpYears*12;
     for(let y=1;v.wAge+y<=Math.min(v.wWorkTo,70);y++){const inc=v.wReturn>0&&y>=v.wReturn?v.wFuture:v.spouse;if(inc>=106){ws+=Math.min(inc/12/Math.pow(1+v.infl/100,y),CAPM)*12;wm+=12}}
-    const hasSp=v.wWorkTo>0||v.spouse>0||v.wPension>0||v.wAge!==v.age;
+    const hasSp=v.hasSpouse!==false&&(v.wWorkTo>0||v.spouse>0||v.wPension>0||v.wAge!==v.age);
     const wHirei=wm>0?ws/wm*0.005481*wm:0,w=hasSp?(BASIC*Math.max(0,480-Math.min(480,v.wStuYears*12))/480+wHirei)*adj(v.wPensionAge):0;
     // 加給年金：あなたの厚生年金20年以上・配偶者の厚生年金20年未満で、配偶者が65歳になるまで
     const kakyu=hEmpY>=20&&wm/12<20&&hasSp?42.37:0;
@@ -1250,7 +1254,7 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
   if(sStageSel===null||!DEC.some(x=>x.d===sStageSel))sStageSel=(DEC.find(x=>x.st!=="ok")||DEC[0]||{}).d??null;
   document.getElementById("sStages").innerHTML=DEC.map((x,i)=>`<button type="button" class="stg ${x.d===sStageSel?"sel":""}" data-stg="${x.d}"><div class="no">STAGE ${i+1}</div><div class="nm">${x.d}代</div><div class="st">${stars(x.st)}</div><div class="mn">${fmt(x.to)}</div><div style="font-size:10.5px;color:var(--sec);margin-top:2px">${Math.round(x.a1)}歳時点の資産</div></button>`).join("");
   const sel=DEC.find(x=>x.d===sStageSel);
-  {const hasSpouse=!!(S.v.spName||S.v.spBirth||num(S.v.spouse)>0||num(S.v.wPension)>0||num(S.v.wWorkTo)>0);
+  {const hasSpouse=S.v.hasSpouse!==false&&!!(S.v.spName||S.v.spBirth||num(S.v.spouse)>0||num(S.v.wPension)>0||num(S.v.wWorkTo)>0);
    if(sel){const yrs=rows.filter(r=>r.age>=sel.a0&&r.age<=sel.a1);
      const KO=S.children.map(c=>({age:num(c.age),univ:c.univ,hs:c.hs||"公立",grad:c.grad||"進学しない",gradType:c.gradType||"国立",send:num(c.csend),sendY:c.csendY==null?4:num(c.csendY),name:c.cname}));
      // 各年のひとこと：在学中の子どもの学年と学費、仕送り、その年の家計の状態
@@ -1285,6 +1289,7 @@ const SG={
   livingSum:()=>r1(LIVK.reduce((s,k)=>s+num(S.v[k]),0)),
   investSum:()=>r1(num(S.v.stock)+num(S.v.fund))};
 function sSet(k,val){const n=num(val);
+  if(k==="hasSpouseSel"){S.v.hasSpouse=val==="いる";return}
   if(k.startsWith("c_")){const[,f,i]=k.split("_");const c=S.children[+i];if(c)c[f]=val;return}
   if(k==="raiseSimple"){const Y=new Date().getFullYear();if(!(S.raises||[]).length)S.raises=[{rfrom:String(Y+1),rto:String(Y+Math.max(1,num(S.v.dropAge)-num(S.v.age)-1)),rrate:String(val)}];else S.raises[0].rrate=String(val);return}
   if(k==="livingSum"){const cur=LIVK.reduce((s,x)=>s+num(S.v[x]),0);if(cur>0)LIVK.forEach(x=>S.v[x]=String(r1(num(S.v[x])*n/cur)));else S.v.other=String(n)}
@@ -1294,6 +1299,7 @@ function sSet(k,val){const n=num(val);
   else S.v[k]=val;}
 function sGet(k){if(SG[k])return SG[k]();
   if(k.startsWith("c_")){const[,f,i]=k.split("_");const c=S.children[+i];return c?c[f]:""}
+  if(k==="hasSpouseSel")return S.v.hasSpouse===false?"いない":"いる";
   if(k==="raiseSimple"){const r=S.raises||[];return r.length?r[0].rrate:S.v.raiseOther}if(k.startsWith("kname")||k.startsWith("kbirth")){const c=S.children[+k.replace(/\D/g,"")];return c?(k.startsWith("kname")?c.cname:c.cbirth)||"":""}if(k.startsWith("kid")){const c=S.children[+k.slice(3)];return c?c.age:0}return S.v[k]}
 function sT(k,label,type,hint){const val=sGet(k)||"";return `<div class="sfld"><div class="top"><div class="lb">${label}${hint?`<small>${hint}</small>`:""}</div><input type="${type}" data-sk="${k}" data-tx="1" value="${esc(val)}" aria-label="${label}" style="width:${type==="date"?150:130}px;border:2.5px solid #231942;border-radius:10px;background:var(--pbg);color:var(--ink);font:15px 'M PLUS Rounded 1c',sans-serif;padding:6px 8px"></div></div>`}
 function sS(k,label,opts,hint){const val=String(sGet(k)??"");return `<div class="sfld"><div class="top"><div class="lb">${label}${hint?`<small>${hint}</small>`:""}</div><select data-sk="${k}" data-tx="1" aria-label="${label}" style="border:2.5px solid #231942;border-radius:10px;background:var(--pbg);color:var(--ink);font:15px 'M PLUS Rounded 1c',sans-serif;padding:6px 8px;max-width:180px">${opts.map(o=>{const[vl,lb]=Array.isArray(o)?o:[o,o];return `<option value="${esc(vl)}" ${String(vl)===val?"selected":""}>${esc(lb)}</option>`}).join("")}</select></div></div>`}
@@ -1305,7 +1311,7 @@ function renderSInput(){const box=document.getElementById("sform");if(!box)retur
   const card=(em,t,body)=>`<div class="pbox"><div class="ptitle"><span class="em">${em}</span>${t}</div>${body}</div>`;
   let h="";
   h+=card("🧑","あなた",sT("myName","名前","text","")+sT("myBirth","生年月日","date","入れると年齢を自動で計算")+sF("age","年齢","歳","",[20,70,1])+sF("gross","年収（額面）","万円","ボーナス込み・税金が引かれる前",[0,2000,10])+`<div class="pnote" id="sNetInfo" style="margin:0 0 8px"></div>`+((S.raises||[]).length<=1?sF("raiseSimple","昇給率（毎年）","%","くわしい入力で期間ごとに変えられます",[-5,10,.5]):`<div class="pnote" style="margin:0 0 8px">昇給：${raisePreview().split("。")[0]}（くわしい入力で変更）</div>`)+sF("retireAge","退職する年齢","歳","",[50,75,1])+sF("severance","退職金の見込み","万円","分からなければ0",[0,5000,50])+(S.v.pensionAuto!==false?`<div class="sfld"><div class="top"><div class="lb">年金の見込み（月）<small>年収と働く期間から自動で計算（今の価値）</small></div><b id="sPens" style="font:18px DotGothic16,monospace"></b></div></div>`:sF("pension","年金の見込み（月）","万円","ねんきん定期便の金額が目安",[0,40,.5])));
-  h+=card("💑","配偶者",sT("spName","名前","text","")+sT("spBirth","生年月日","date","入れると年齢を自動で計算")+sF("wAge","配偶者の年齢","歳","",[20,70,1])+sF("spouse","配偶者の今の年収","万円","いない・専業主婦（夫）なら0",[0,1500,10])+sF("wReturn","これから働き始めるのは","年後","予定がなければ0",[0,20,1])+sF("wFuture","働き始めた後の年収","万円","パートなら100万前後、正社員なら300万〜など",[0,1500,10])+sF("wSaveRate","そのうち貯蓄に回す割合","%","100なら全額貯蓄。残りは生活費が増える",[0,100,5])+sF("wWorkTo","何歳まで働くか","歳","",[40,75,1])+sF("wEmpYears","これまで会社員だった年数","年","年金の自動計算に使います",[0,45,1])+sF("wPastIncome","その頃の年収","万円","",[0,1000,10]));
+  h+=card("💑","配偶者",sS("hasSpouseSel","配偶者",["いる","いない"])+sT("spName","名前","text","")+sT("spBirth","生年月日","date","入れると年齢を自動で計算")+sF("wAge","配偶者の年齢","歳","",[20,70,1])+sF("spouse","配偶者の今の年収","万円","いない・専業主婦（夫）なら0",[0,1500,10])+sF("wReturn","これから働き始めるのは","年後","予定がなければ0",[0,20,1])+sF("wFuture","働き始めた後の年収","万円","パートなら100万前後、正社員なら300万〜など",[0,1500,10])+sF("wSaveRate","そのうち貯蓄に回す割合","%","100なら全額貯蓄。残りは生活費が増える",[0,100,5])+sF("wWorkTo","何歳まで働くか","歳","",[40,75,1])+sF("wEmpYears","これまで会社員だった年数","年","年金の自動計算に使います",[0,45,1])+sF("wPastIncome","その頃の年収","万円","",[0,1000,10]));
   const n=S.children.length;
   h+=card("👶","子ども",`<div class="chips">${[0,1,2,3,4].map(i=>`<button type="button" class="chip ${i===n?"on":""}" data-kids="${i}">${i}人</button>`).join("")}</div>`+S.children.map((c,i)=>`<div style="border-top:2.5px dashed var(--sep);margin-top:10px;padding-top:4px"></div>`+sT("kname"+i,`${i+1}人目の名前`,"text","")+sT("kbirth"+i,"生年月日（出産予定日）","date","入れると年齢を自動で計算")+sF("kid"+i,`${i+1}人目の年齢`,"歳","生まれる予定なら −1",[-1,22,1])+(num(c.age)<6?sF("c_care_"+i,"保育料・幼稚園代（月）","万円","無償化の年齢からは自動で0円",[0,15,.5]):"")+sS("c_hs_"+i,"高校",["公立","私立"])+sS("c_univ_"+i,"大学",UNIV)+(c.univ!=="進学しない"?sS("c_grad_"+i,"大学院",Object.keys(GRAD_Y))+((c.grad&&c.grad!=="進学しない")?sS("c_gradType_"+i,"大学院の種類",["国立","私立"]):""):"")+(c.univ!=="進学しない"?sF("c_csend_"+i,"仕送り（月）","万円","一人暮らしをする場合。なければ0",[0,20,.5]):"")).join("")+`<p class="pnote" style="margin:8px 0 0">教育費・入学金・児童手当は自動で計算するよ。</p>`);
   h+=card("🏠","住まい",sF("house","住居費（月）","万円","家賃、またはローン返済＋管理費",[0,40,.5])+sF("loanBal","ローンの残り","万円","ローンがなければ0",[0,8000,50])+sF("loanEndAge","完済予定の年齢","歳","",[30,85,1])+sF("loanRate","金利","%","",[0,5,.05])+sF("loanBonus","ボーナス払い（1回あたり）","万円","なければ0",[0,100,1])+sS("loanBonusM1","ボーナス払いの月（1回目）",[["0","なし"],...Array.from({length:12},(_,i)=>[String(i+1),(i+1)+"月"])])+sS("loanBonusM2","ボーナス払いの月（2回目）",[["0","なし"],...Array.from({length:12},(_,i)=>[String(i+1),(i+1)+"月"])])+sS("region","お住まいの地域",Object.keys(REGIONS),"保育料の無償化・手当に影響")+sLink(`追加のローン（${(S.loans||[]).length}件）・一括購入（${(S.purchases||[]).length}件）を入力`,"住まい・ローン"));
@@ -1478,6 +1484,38 @@ function renderPlanCompare(L){const boxes=[document.getElementById("dPlanCmp"),d
   boxes.forEach(b=>{if(b){b.hidden=false;b.innerHTML=html}});heads.forEach(h=>{if(h)h.hidden=false});
   const ser=base.sum.series.map((x,i)=>{const o={age:x.age};L.forEach((p,j)=>o["p"+j]=(p.sum.series[i]||{}).fin);return o});
   try{document.querySelectorAll("#planCmpChart").forEach((el,i)=>{el.id="planCmpChart"+i;drawChart(el.id,ser,L.map((p,j)=>({k:"p"+j,c:PLAN_COLORS[j],w:j?2:3,l:p.name})),{})})}catch(e){}}
+/* ===== AIに渡す用のまとめ（名前・生年月日は含めない） ===== */
+function buildAIReport(){
+  // 入力画面を開いていなくても計算の説明文を取れるよう、一時的に受け皿を作って計算し直す
+  const need=["netInfo","pensAutoInfo","b0Info","mortInfo","dTotals"].filter(id=>!document.getElementById(id));let tmp=null;
+  if(need.length){tmp=document.createElement("div");tmp.hidden=true;tmp.innerHTML=need.map(id=>`<div id="${id}"></div>`).join("");document.body.appendChild(tmp);const LS=LIGHT;LIGHT=true;try{calc()}finally{LIGHT=LS}}
+  try{return buildAIReportCore()}finally{if(tmp)tmp.remove()}}
+function buildAIReportCore(){const strip=h=>String(h||"").replace(/<br\s*\/?>/g,"\n").replace(/<[^>]+>/g," ").replace(/[ \t]+/g," ").replace(/ *\n */g,"\n").trim();
+  const T=id=>{const e=document.getElementById(id);return e?strip(e.innerHTML):""};const L=[];const v=S.v;const skip=new Set(["myName","myBirth","spName","spBirth","setupDone","_advOpen","_legacySave"]);
+  L.push("# わが家のライフプラン（家計の健康診断アプリの入力内容と計算結果）","","金額の単位は万円。年齢は世帯主の年齢。このアプリの計算方法は https://tennis226243-coder.github.io/shikumi.html に公開しています。","");
+  L.push("## 入力内容");
+  FIELDS.forEach(([g,it])=>{const rows=it.filter(f=>!skip.has(f[0])).map(f=>{const[k,l,,u]=f;let x=v[k];if(x===undefined||x===null||x==="")return null;if(x===true)x="はい";else if(x===false)x="いいえ";
+      return `- ${l}：${x}${["万円","%","歳","年","年後","か月","歳から","歳まで","年ごと"].includes(u)?u:""}`}).filter(Boolean);if(rows.length)L.push(`### ${g}`,...rows)});
+  if((S.children||[]).length){L.push("### 子ども");S.children.forEach((c,i)=>L.push(`- ${i+1}人目：今${num(c.age)}歳、保育料 月${num(c.care)}万円、高校 ${c.hs||"公立"}、大学 ${c.univ||"—"}${c.grad&&c.grad!=="進学しない"?`、大学院 ${c.grad}（${c.gradType||"国立"}）`:""}${num(c.csend)>0?`、仕送り 月${num(c.csend)}万円×${c.csendY||4}年`:""}`))}
+  if((S.raises||[]).length){L.push("### 昇給の予定");S.raises.forEach(r=>L.push(`- ${r.rfrom}〜${r.rto}年：${r.rrate}%`))}
+  if((S.loans||[]).length){L.push("### 追加のローン");S.loans.forEach(x=>L.push(`- ${x.lname}：${x.lamount}万円、${x.lyear}年${x.lmonth}月から${x.lterm}年、金利${x.lrate}%`))}
+  if((S.purchases||[]).length){L.push("### 一括購入");S.purchases.forEach(x=>L.push(`- ${x.pname}：${x.pamount}万円、${x.pyear}年${x.pmonth}月${num(x.pevery)>0?`、${x.pevery}年ごと（〜${x.puntil}年）`:""}`))}
+  if((S.events||[]).length){L.push("### ライフイベント");S.events.forEach(x=>L.push(`- ${x.ename}：${x.eage}歳で${x.ecost}万円${num(x.eevery)>0?`、${x.eevery}年ごと（〜${x.euntil}歳）`:""}`))}
+  L.push("","## 計算結果");
+  [["今の時点の判定","nowMetrics"],["手取りの計算","netInfo"],["年金の自動計算","pensAutoInfo"],["基本生活費","b0Info"],["これからの収入と支出の合計","dTotals"],["住まいの支払い","mortInfo"]].forEach(([t,id])=>{const x=T(id);if(x)L.push(`### ${t}`,x)});
+  const rows=(CH.chart&&CH.chart.rows)||[];if(rows.length){const a0=num(v.age),dv=r=>Math.pow(1+num(v.infl)/100,r.age-a0);
+    L.push("### 1年ごとの見通し（名目額。今の価値は物価上昇率で割り戻した額）","| 年齢 | 年収(額面) | 収入 | 支出 | 収支 | 預貯金 | 株式・投信 | 金融資産計 | 金融資産計(今の価値) | ローン残高 |","|---|---|---|---|---|---|---|---|---|---|");
+    rows.forEach((r,i)=>L.push(`| ${r.age} | ${i?Math.round(r.grossY||0):"—"} | ${i?Math.round(r.inc):"—"} | ${i?Math.round(r.spend):"—"} | ${i?Math.round(r.inc-r.spend):"—"} | ${Math.round(r.cash)} | ${Math.round(r.invA||0)} | ${Math.round(r.fin)} | ${Math.round(r.fin/dv(r))} | ${Math.round(r.debt||0)} |`))}
+  L.push("","## 相談したいこと","あなたは日本のファイナンシャルプランナー（CFP）です。上の入力内容と計算結果をもとに、次の点を教えてください。","1. この計算結果は、入力内容から見て妥当ですか。おかしな点や、見落としている支出・リスクはありますか。","2. この家計の一番の課題と、優先して取り組むべき見直しを3つ、効果の大きさ（万円）とともに教えてください。","3. 教育費のピーク・住宅ローン・老後資金について、それぞれ注意点を教えてください。");
+  return L.join("\n")}
+function showAIReport(){const txt=buildAIReport();let ov=document.getElementById("aiOv");if(ov)ov.remove();
+  ov=document.createElement("div");ov.id="aiOv";ov.style.cssText="position:fixed;inset:0;z-index:9998;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px";
+  ov.innerHTML=`<div style="background:var(--cell,#fff);color:var(--label,#000);border-radius:16px;max-width:640px;width:100%;max-height:86vh;display:flex;flex-direction:column;padding:14px;gap:10px"><b>ChatGPTに渡す用のまとめ</b><small style="color:var(--sec,#666)">名前・生年月日は含めていません。「コピー」を押して、ChatGPTの入力欄に貼り付けてください。</small><textarea readonly style="flex:1;min-height:40vh;width:100%;font:12px/1.5 monospace;border:1px solid #ccc;border-radius:10px;padding:8px">${esc(txt)}</textarea><div style="display:flex;gap:8px"><button type="button" id="aiCopy" class="btn" style="margin:0;flex:1">コピー</button>${!window.claude||window.FB_MODE?`<button type="button" id="aiDl" class="btn sub" style="margin:0;flex:1">ファイルで保存</button>`:""}<button type="button" id="aiClose" class="btn sub" style="margin:0;flex:1">閉じる</button></div></div>`;
+  document.body.appendChild(ov);const ta=ov.querySelector("textarea");
+  ov.querySelector("#aiClose").onclick=()=>ov.remove();ov.addEventListener("click",e=>{if(e.target===ov)ov.remove()});
+  ov.querySelector("#aiCopy").onclick=async()=>{try{await navigator.clipboard.writeText(txt);toast("コピーしました。ChatGPTに貼り付けてください")}catch(e){ta.focus();ta.select();try{document.execCommand("copy");toast("コピーしました")}catch(x){toast("文字を長押しして、すべて選択→コピーしてください")}}};
+  const dl=ov.querySelector("#aiDl");if(dl)dl.onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/markdown"}));a.download=`わが家のライフプラン_${new Date().toISOString().slice(0,10)}.md`;document.body.appendChild(a);a.click();a.remove()}}
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-aireport]");if(!t)return;showAIReport()});
 let SCEN_RES=null,SCEN_OPEN=false;const SCEN_INTRO_D=`<div class="row"><div class="lbl">今の計画と「もしも」を並べて比べます<small>昇給が低い・金利上昇・私立進学・貯まる割合・運用悪化・世帯主の万一・働けなくなる</small></div></div>`,SCEN_INTRO_S="今の計画と「もしも」を並べて比べるよ。";
 function runScenarios(){const S0=S,gE=document.getElementById,gQ=document.querySelectorAll;const res=[];
   const dummy={innerHTML:"",textContent:"",value:"",hidden:false,style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},setAttribute(){},querySelector:()=>null,querySelectorAll:()=>[],contains:()=>false,after(){}};

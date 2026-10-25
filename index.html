@@ -188,6 +188,8 @@ body.setup .tabbar{display:none}
 .ages .evage.pb{overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ybtn{flex:none;border:2px solid #231942;background:var(--paper);color:var(--ink);font:800 11px "M PLUS Rounded 1c",sans-serif;padding:3px 8px;border-radius:999px;cursor:pointer;align-self:center}
 .ycm{font-size:12px;color:var(--sec);line-height:1.5;margin-top:2px}
+.yrow .ybal.ydet{flex:0 0 100%!important;width:100%!important;min-width:0!important}
+.yrow .evname{flex:1 1 0!important;min-width:0}
 .ydet{display:grid!important;grid-template-columns:1fr 1fr;flex-basis:100%;min-width:0;text-align:left!important;gap:4px 10px;padding:6px 0 2px;font-size:11px}
 .ydet>.goal{grid-column:1/-1}
 .evlist.nofam .ages{display:none}
@@ -402,6 +404,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
   <p class="gf">公表されている数値や、計算上必ず成り立つはずの関係を、このページの計算で再現できるかを確かめます。</p>
   <p class="gf">計算に入れていないもの：住民税が前年の所得にかかる時間差、社会保険料率の将来の変化、iDeCoを一時金で受け取るときの税金、生命保険の保険金、相続、介護・医療の実際の費用（ライフイベントで入力してください）。</p>
   </details>
+  <p class="gf">アプリのバージョン <span class="appver"></span></p>
   <div class="gh">AIに相談する</div>
   <div class="group"><div class="row tap" role="button" tabindex="0" data-aireport="1">🤖 ChatGPTに渡す用に、入力内容と結果をまとめる</div></div>
   <p class="gf">名前・生年月日は含めません。年齢・金額などの入力内容と計算結果を文章にまとめ、ChatGPTなどにそのまま貼り付けられる形でコピーします。</p>
@@ -460,6 +463,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
   <button class="pbtn" type="button" id="sSave">この結果をセーブ</button>
   <button class="pbtn alt" type="button" data-go="v-input">数字を変えてみる</button>
   <button type="button" class="pbtn alt" data-aireport="1" style="margin:0 0 10px;width:100%">🤖 ChatGPTに渡す用にまとめる</button>
+<p class="pnote" style="margin-bottom:4px">アプリのバージョン <span class="appver"></span></p>
 <p class="pnote" style="margin-bottom:10px">目安の計算です。計算の式と出典は「くわしい版」の診断の一番下「計算のしくみ」にすべて載せているよ。大事な判断は専門家にも相談してね。</p>
 </section>
 
@@ -787,11 +791,13 @@ function ageFrom(b,frac){if(!b)return null;const d=new Date(b+"T00:00:00");if(is
   if(frac)return Math.round((n-d)/(365.2425*864e5)*10)/10;let a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a}
 function applyBirthdays(){const a=ageFrom(S.v.myBirth);if(a!=null)S.v.age=String(a);const w=ageFrom(S.v.spBirth);if(w!=null)S.v.wAge=String(w);
   (S.children||[]).forEach(c=>{const x=ageFrom(c.cbirth,true);if(x!=null)c.age=String(x)})}
+const APP_VERSION="33",APP_UPDATED="2026年10月25日";
 let QUIET=false,LIGHT=false,HT=null,BOOT=true;const HC={reqCut:null,reqRows:null,mcProb:null,mcP:{}};
 function calcLight(){LIGHT=true;try{calc()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>calc(),700)}
 // 起動直後は軽い計算だけで画面を出し、重い計算（確率・必要な節約額・比較プラン）は少し後に1回だけ行う
 function calc(){if(BOOT&&!QUIET&&!LIGHT&&!CMP_SKIP){LIGHT=true;try{calcCore()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>{BOOT=false;calc()},900);return}calcCore()}
 function calcCore(){
+  if(!QUIET)document.querySelectorAll(".appver").forEach(e=>{e.textContent=`${APP_VERSION}（${APP_UPDATED}更新）`});
   {const bm=document.getElementById("bootMsg");if(bm&&bm.remove&&!QUIET)bm.remove()}
   applyBirthdays();
   const v={};for(const k in S.v)v[k]=typeof S.v[k]==="boolean"?S.v[k]:((k==="region"||k==="dcMethod"||k==="saveMode"||k==="spendBasis"||k==="raiseMode"||k==="maintMode"||k==="myName"||k==="spName"||k==="myBirth"||k==="spBirth")?S.v[k]:(k==="netOverride"&&String(S.v[k]).trim()===""?null:num(S.v[k])));
@@ -1037,7 +1043,7 @@ function calcCore(){
     // 年代別の預貯金の割合に合わせて調整（リバランス）
     if(v.cashRatioOn){const liq=cash+invA;if(liq>0){const cr=(age<40?v.cr30:age<50?v.cr40:age<60?v.cr50:age<70?v.cr60:v.cr70)/100;cash=liq*cr;invA=liq-cash}}
     const tot=cash+invA+dcA;
-    {const av=age<60?cash+invA:tot;if(av<0&&shortAge===null){shortAge=age;add(age,"資金不足が始まる（使えるお金がマイナス）",0,true)}}
+    {const av=age<60?cash+invA:tot;if(av<0&&shortAge===null){shortAge=age;add(age,"資金不足が始まる",0,true)}}
     if(tot>peak.val)peak={age,val:tot};
     rows.push({avail:age<60?cash+invA:tot,comp:{liv:cLiv,kids:cKids,edu:cEdu,send:cSend,loan:cLoan,maint:cMaint,tako:takoSave,borrow:cBorrow},age,fin:tot,cash,debt:bal+loanBalAll(y*12),wife:wA,kids:kf.slice(),ev:yr,cash0,contribY:contrib,sal,wInc,inc,netW,grossY,ifr,inv0,invC,invGain,invDraw,save:ifr!=null?ifr-(exp-contrib)+kidSaved-kidSaved:null,kd:kidDeltaY,lp,invA,pens:pensNetY,ide:idePay,spend:exp-contrib,gain});
   }
@@ -1309,7 +1315,7 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
        if(hasSpouse)ppl.push([S.v.spName||"配偶者",Math.round(v.wAge+off),PC[1]]);
        S.children.forEach((k,i)=>{const ka=Math.floor(num(k.age)+off);if(ka>=0)ppl.push([k.cname||"子"+(i+1),ka,PC[2+i%4]])});
        return `<li class="yrow${sYOpen.has(Math.round(r.age))?" open":""}"><div class="ages">${ppl.map(([n,a,c])=>`<span class="evage pb" style="background:${c}">${esc(n)} ${a}歳</span>`).join("")}</div><div class="evname">${evs.length?evs.map(t=>`<div>${esc(t.t)}${t.amt?` <span class="evamt ${t.amt<0?"m":"p"}">${t.amt>0?"+":"−"}${fmt(Math.abs(t.amt))}</span>`:""}</div>`).join(""):""}${cm.map(x=>`<div class="ycm">${x}</div>`).join("")}</div>
-         <div class="ybal ydet">${(()=>{const now=r.age===v.age,ifr=now?c.net:r.ifr,sv=now?v.actualSave:r.save;if(ifr==null||sv==null)return"";const rq=reqRows&&reqRows.find(q=>q.age===r.age),tg=rq&&rq.save!=null?Math.max(0,rq.save):0,ok=sv>=tg-1;
+         <div class="ybal ydet">${(()=>{const now=r.age===v.age,ifr=now?c.net:r.ifr,sv=now?v.actualSave:r.save;if(ifr==null||sv==null)return"";const rq=reqRows&&reqRows.find(q=>q.age===r.age),tg=rq&&rq.save!=null?Math.max(0,rq.save):0,ok=sv>=tg-1;if(tg<0.5&&sv<0)return"";
              return `<div class="goal ${ok?"ok":"ng"}">貯蓄 目標 <b>${fmt(tg)}</b><br>${now?"今年":"予想"} <b>${fmt(sv)}</b> <span class="mk">${ok?"✓":"▼"+fmt(tg-sv)}</span></div>`})()}${r.cash+(r.invA||0)<0?`<div class="dbt">資金不足 <b>${fmt(-(r.cash+(r.invA||0)))}</b></div>`:`<div>すぐ使えるお金 <b>${fmt(r.cash+(r.invA||0))}</b></div>`}<div>金融資産 <b>${fmt(r.fin-r.cash-(r.invA||0))}</b></div>${r.debt>0.5?`<div class="dbt">ローン ${fmt(r.debt)}</div>`:""}</div></li>`}).join("");
      document.getElementById("sStageTip").innerHTML=`<div class="tipbox"><div class="tiphead"><b>${sel.d}代</b>（${Math.round(sel.a0)}〜${Math.round(sel.a1)}歳）</div><div class="tipwhy">${esc(sel.why)}</div><div class="liqbox ${sel.liqHave>=sel.liqSafe?"ok":sel.liqHave>=sel.liqNeed?"mid":"ng"}">💰 ${Math.round(sel.a1)}歳までに貯めたい「すぐ使えるお金」<br>最低 <b>${fmt(sel.liqNeed)}</b>　安心 <b>${fmt(sel.liqSafe)}</b><br>予想 <b>${fmt(sel.liqHave)}</b><br><span style="font-size:11px">いちばん少なくなるのは ${Math.round(sel.liqAt)}歳ごろ（予想 ${fmt(sel.liqLow)}）</span> ${sel.liqHave>=sel.liqSafe?"✓ 安心ラインを達成":sel.liqHave>=sel.liqNeed?"△ 最低ラインはクリア":"▼ "+fmt(sel.liqNeed-sel.liqHave)+"不足"}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0"><button type="button" class="ybtn" id="yList" aria-expanded="${sYList}">${sYList?"1年ごとの一覧を閉じる ▴":"1年ごとの一覧を見る ▾"}</button>${sYList?`<button type="button" class="ybtn" id="yFam" aria-pressed="${sYFam}">${sYFam?"家族の年齢を隠す":"家族の年齢を表示"}</button>`:""}</div>${sYList?`<div class="pnote" style="margin:0 0 4px">貯蓄の目標＝90歳まで資産が生活費6か月分を下回らないために必要な貯蓄額。すぐ使えるお金＝預貯金＋株式・投資信託、金融資産＝iDeCo・企業型DC、ローン＝住宅ローン＋追加ローンの残高</div><ul class="evlist${sYFam?"":" nofam"}">${body}</ul>`:""}</div>`;
      document.querySelectorAll("[data-yb]").forEach(b=>b.addEventListener("click",()=>{const a=+b.dataset.yb,li=b.closest("li");if(sYOpen.has(a))sYOpen.delete(a);else sYOpen.add(a);const o=sYOpen.has(a);if(li)li.classList.toggle("open",o);b.textContent=o?"閉じる ▴":"詳細 ▾";b.setAttribute("aria-expanded",o)}));
@@ -1876,7 +1882,7 @@ function dataTools(){return `<div class="gh">データの管理</div><div class=
   ${window.FB_MODE?`<div class="row tap" role="button" tabindex="0" id="shareApp">📤 このアプリを紹介する（入力値は共有されません）</div>`:""}
   <div class="row tap" role="button" tabindex="0" id="resetDev">🧹 この端末の入力をクリアする（家計のデータは残す）</div>
   <div class="row tap danger" role="button" tabindex="0" id="delData">この家計のデータをすべて削除する</div></div>
-  <div class="gh">ご利用にあたって</div><div class="group"><div class="row"><div class="lbl"><small>・この診断は、公的な統計と計算式にもとづく目安です。将来の結果を保証するものではなく、特定の金融商品の購入や投資をすすめるものでもありません。<br>・大きな判断（住宅・保険・投資など）は、ファイナンシャルプランナーなどの専門家にも相談してください。<br>・入力したデータは、この家計の招待コードを知っている家族だけが見られる形で保存されます。書き出したデータは、ご自身で安全に保管してください。<br>・「この端末の入力をクリア」は、この端末から入力内容を消して家計から抜けるだけで、家族の端末や家計のデータは消えません。招待コードを入れればまた戻れます。<br>・「すべて削除」を行うと、家族全員の入力内容・保存した結果・家計簿・実績が消え、元に戻せません。</small></div></div></div>`}
+  <div class="gh">ご利用にあたって</div><div class="group"><div class="row"><div class="lbl"><small>・アプリのバージョン：${APP_VERSION}（${APP_UPDATED}更新）<br>・この診断は、公的な統計と計算式にもとづく目安です。将来の結果を保証するものではなく、特定の金融商品の購入や投資をすすめるものでもありません。<br>・大きな判断（住宅・保険・投資など）は、ファイナンシャルプランナーなどの専門家にも相談してください。<br>・入力したデータは、この家計の招待コードを知っている家族だけが見られる形で保存されます。書き出したデータは、ご自身で安全に保管してください。<br>・「この端末の入力をクリア」は、この端末から入力内容を消して家計から抜けるだけで、家族の端末や家計のデータは消えません。招待コードを入れればまた戻れます。<br>・「すべて削除」を行うと、家族全員の入力内容・保存した結果・家計簿・実績が消え、元に戻せません。</small></div></div></div>`}
 function bindDataTools(){
   const sa=document.getElementById("shareApp");if(sa)act(sa,async()=>{const url=APP_URL_FN();try{if(navigator.share){await navigator.share({title:"家計の健康診断",url});return}}catch(e){return}try{await navigator.clipboard.writeText(url);toast("アプリのURLをコピーしました")}catch(e){toast(url)}});
   const rd=document.getElementById("resetDev");if(rd){let arm=false;act(rd,async()=>{if(!arm){arm=true;rd.textContent="もう一度タップでこの端末をクリア";setTimeout(()=>{arm=false;rd.textContent="🧹 この端末の入力をクリアする（家計のデータは残す）"},4000);return}

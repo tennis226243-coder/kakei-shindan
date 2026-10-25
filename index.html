@@ -385,7 +385,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
    <li><b>年金</b>＝基礎年金（手取りは1人あたりの年金額に応じて額面の95%・90%・86%）（2026年度満額 年84.73万円 ×（480か月−学生納付特例で追納していない月数）÷480）＋厚生年金（平均年収÷12×5.481/1000×加入月数）。60歳以降も会社員として働く期間は「経過的加算」として基礎年金と同じ単価で上乗せ（厚生年金の加入は480か月まで）。受け取り開始が65歳より早いと1か月0.4%減、遅いと0.7%増。条件を満たせば加給年金</li>
    <li><b>大学院</b>：修士は2年、博士は5年（修士2年＋博士3年）。国立は標準額（授業料年53.58万円・入学金28.2万円）、私立は文部科学省の調査の博士前期課程の平均（授業料77.6万円＋施設設備費7.6万円、入学料20.3万円）。在学中は自宅なら子どもの生活費が続き、修了の年に独立します</li>
    <li><b>教育費</b>：文部科学省「子供の学習費調査（令和5年度）」、私立大学の学生納付金調査（令和7年度）、国立大学の標準額。高校は2026年4月からの就学支援金を反映</li>
-   <li><b>90歳まで資金が持つ確率</b>：運用利回りに毎年ランダムなブレ（標準偏差12%）を加えて200回試算し、資産が一度も0を下回らなかった割合</li>
+   <li><b>確率</b>：運用利回りに毎年ランダムなブレ（標準偏差12%）を加えて200回試算し、「使えるお金」（60歳まではiDeCoを除く）が一度もマイナスにならなかった割合と、退職後にマイナスにならなかった割合</li><li><b>資金不足</b>：預貯金と投資を使い切っても足りない分は、教育ローンなどの借入（初期値 年2.5%）でまかなう前提で利息を計上します</li>
    <li><b>家計の余裕／必要な節約</b>：基本生活費を月いくら増減すれば、90歳まで資産が生活費6か月分を下回らないかを二分探索で求めます</li>
    <li><b>同じ年収の世帯との比較</b>：総務省「令和6年全国家計構造調査」の勤労者世帯の年間収入五分位（〜351万・〜510万・〜689万・〜932万・それ以上）の消費支出と費目の割合から、カテゴリーごとの月額を計算して、入力した毎月の支出と比べます</li>
    <li><b>万一・働けなくなる場合</b>：遺族年金＝遺族基礎年金（子の加算あり・子が18歳まで）＋遺族厚生年金（厚生年金の3/4）。障害年金2級＝障害基礎年金（子の加算あり）＋障害厚生年金。傷病手当金は給与の2/3を最長1年6か月。入力した死亡保険金・収入保障保険・就業不能保険を加えます</li>
@@ -538,7 +538,7 @@ const FIELDS=[
  ["収入のくわしい設定",[["baseSalary","基本給（月額）",0,"万円","入れると、昇給率は基本給にだけかかります。0なら年収全体にかかります"],["bonusAnnual","ボーナスの年額",0,"万円","今年の賞与の合計（額面）"],["bonusLinked","ボーナスも基本給に連動する",true,"chk","賞与が「基本給×〇か月分」で決まる場合はオン"],["overtime","残業代（年額）",0,"万円","年収に含まれる残業代。昇給率はかけず、毎年同じ額で計算します"],["otEndAge","残業代がなくなる年齢",60,"歳","管理職になる・働き方が変わるなど"],["netOverride","手取り年収","","万円","分かれば入力。空欄なら自動で計算します"],["raiseMode","昇給の計算方法","昇給の予定を使う","sel","全国平均の賃金カーブを選ぶと、年齢ごとの平均的な給料の伸び方（定期昇給）で計算します"],["curveBaseUp","ベースアップ（全員の底上げ・年）",1,"%","賃金カーブを使うときだけ。物価や景気による毎年の賃上げ"],["raiseMonth","昇給の月",4,"mon","毎年この月の給与から昇給する。年収はその年の各月の平均で計算します"],["raiseOther","下の期間以外の昇給率",0,"%","期間を設定していない年に使います"],["dropAge","収入が下がる年齢",60,"歳","役職定年・再雇用など"],["dropRate","下がった後の収入",70,"%","それまでの収入に対する割合"],["lifeIns","死亡保険金（一時金）",0,"万円","世帯主が亡くなったときに受け取る額"],["ipMonthly","収入保障保険（月額）",0,"万円","亡くなった後、毎月受け取る額"],["ipUntil","収入保障保険を受け取る最後の年齢",65,"歳","世帯主が生きていれば何歳になる年まで"],["diMonthly","就業不能保険（月額）",0,"万円","働けなくなったときに毎月受け取る額"],["diUntil","就業不能保険を受け取る最後の年齢",65,"歳"],["teikiKosei","ねんきん定期便の厚生年金額（これまでの実績・年額）",0,"万円","定期便の「これまでの加入実績に応じた年金額」のうち老齢厚生年金の金額。入れると過去の分はこの金額を使います（0なら年収から推定）"],["pensionReal","年金の伸び（物価との差）",-0.4,"%","年金は物価に合わせて改定されるが、マクロ経済スライドで少し低く抑えられる想定（0なら物価と同じだけ増える）"]],{adv:true}],
  ["老後と子どもの支出",[["retireRatio","退職後の生活費",88,"%","退職直前の生活費に対する割合。全国平均（家計調査2025）は約88%。その後は年齢とともに減ります"]],{adv:true}],
  ["預貯金の割合（年代別）",[["cashRatioOn","年代ごとに預貯金の割合を保つ",false,"chk","オンにすると、毎年末に「預貯金」と「株式・投資信託」の割合を下の値に調整します（iDeCoは対象外）"],["cr30","〜30代",40,"%","すぐ使えるお金（預貯金＋株式・投資信託）のうち預貯金にする割合"],["cr40","40代",40,"%"],["cr50","50代",50,"%"],["cr60","60代",60,"%"],["cr70","70代以降",70,"%"]],{adv:true}],
- ["計算の前提",[["ret","運用利回り（現役中）",3,"%"],["retRet","運用利回り（退職後）",1.5,"%","退職後は安全重視に切り替える想定"],["infl","物価上昇率（年）",1.5,"%"],["nisaCap","非課税（NISA）で運用できる上限",1800,"万円","夫婦2人で使うなら3600。超えた分の運用益には約20%の税金がかかる計算にします"],["mcSd","運用のブレ（1年あたり）",12,"%","「90歳まで資金が持つ確率」の計算に使う、運用成績のばらつき"]],{adv:true}]
+ ["計算の前提",[["ret","運用利回り（現役中）",3,"%"],["retRet","運用利回り（退職後）",1.5,"%","退職後は安全重視に切り替える想定"],["infl","物価上昇率（年）",1.5,"%"],["nisaCap","非課税（NISA）で運用できる上限",1800,"万円","夫婦2人で使うなら3600。超えた分の運用益には約20%の税金がかかる計算にします"],["borrowRate","資金不足のときの借入金利",2.5,"%","預貯金と投資を使い切っても足りない年は、教育ローンなどで借りる前提で利息を計上します"],["mcSd","運用のブレ（1年あたり）",12,"%","「90歳まで資金が持つ確率」の計算に使う、運用成績のばらつき"]],{adv:true}]
 ];
 const LISTS={
  raises:{title:"昇給の予定",add:"期間を追加",
@@ -562,7 +562,7 @@ const RANGE={age:[20,70,1],gross:[0,3000,10],netOverride:[0,2000,10],raiseOther:
  cash:[0,5000,10],stock:[0,5000,10],fund:[0,5000,10],dc:[0,3000,10],dcEnd:[40,75,1],dcRate:[0,10,.5],dcLow:[-3,10,.5],dcHigh:[0,15,.5],dcStart:[60,75,1],invest:[0,30,.5],dcMonthly:[0,7,.1],
  loanBal:[0,10000,50],loanEndAge:[30,85,1],loanBonus:[0,100,1],loanRate:[0,5,.05],
  food:[0,30,.5],util:[0,15,.5],house:[0,40,.5],misc:[0,30,.5],comm:[0,10,.5],gas:[0,10,.5],ins:[0,10,.1],other:[0,50,.5],special:[0,500,5],saveRate:[-20,60,1],retireRatio:[50,100,5],
- ret:[0,10,.5],workStart:[15,40,1],wEmpYears:[0,45,1],wPastIncome:[0,1000,10],pastRaise:[0,5,.5],wSaveRate:[0,100,5],loanDedEnd:[0,2060,1],loanPayActual:[0,30,0.1],propTax:[0,100,0.5],stuYears:[0,10,1],wStuYears:[0,10,1],lifeIns:[0,10000,100],ipMonthly:[0,50,1],ipUntil:[40,80,1],diMonthly:[0,50,1],diUntil:[40,80,1],curveBaseUp:[-2,5,.5],homePrice:[0,20000,100],shuzen:[0,10,.1],shuzenUp:[0,6,.5],nisaCap:[0,5000,100],mcSd:[0,30,1],sr30:[-20,60,1],sr40:[-20,60,1],sr50:[-20,60,1],sr60:[-20,60,1],baseSalary:[0,100,.1],bonusAnnual:[0,1000,5],overtime:[0,500,1],otEndAge:[30,75,1],cr30:[0,100,5],cr40:[0,100,5],cr50:[0,100,5],cr60:[0,100,5],cr70:[0,100,5],homeValue:[0,20000,50],year:[2020,2080,1],act_gross:[0,3000,1],act_wtax:[0,500,.1],act_social:[0,500,.1],act_rtax:[0,300,.1],act_spouseInc:[0,1500,1],act_cash:[0,10000,1],act_invest:[0,10000,1],act_dc:[0,5000,1],act_loanBal:[0,10000,1],act_spend:[0,3000,1],teikiKosei:[0,300,1],retRet:[0,6,.5],creep:[0,100,10],infl:[0,5,.1],age_c:[-5,22,.5],care:[0,15,.5],extra:[0,15,.5],cfund:[0,1000,5],cmonthly:[0,10,.1],csend:[0,20,.5],csendY:[0,6,1],crate:[0,7,.5],
+ ret:[0,10,.5],workStart:[15,40,1],wEmpYears:[0,45,1],wPastIncome:[0,1000,10],pastRaise:[0,5,.5],borrowRate:[0,10,.5],wSaveRate:[0,100,5],loanDedEnd:[0,2060,1],loanPayActual:[0,30,0.1],propTax:[0,100,0.5],stuYears:[0,10,1],wStuYears:[0,10,1],lifeIns:[0,10000,100],ipMonthly:[0,50,1],ipUntil:[40,80,1],diMonthly:[0,50,1],diUntil:[40,80,1],curveBaseUp:[-2,5,.5],homePrice:[0,20000,100],shuzen:[0,10,.1],shuzenUp:[0,6,.5],nisaCap:[0,5000,100],mcSd:[0,30,1],sr30:[-20,60,1],sr40:[-20,60,1],sr50:[-20,60,1],sr60:[-20,60,1],baseSalary:[0,100,.1],bonusAnnual:[0,1000,5],overtime:[0,500,1],otEndAge:[30,75,1],cr30:[0,100,5],cr40:[0,100,5],cr50:[0,100,5],cr60:[0,100,5],cr70:[0,100,5],homeValue:[0,20000,50],year:[2020,2080,1],act_gross:[0,3000,1],act_wtax:[0,500,.1],act_social:[0,500,.1],act_rtax:[0,300,.1],act_spouseInc:[0,1500,1],act_cash:[0,10000,1],act_invest:[0,10000,1],act_dc:[0,5000,1],act_loanBal:[0,10000,1],act_spend:[0,3000,1],teikiKosei:[0,300,1],retRet:[0,6,.5],creep:[0,100,10],infl:[0,5,.1],age_c:[-5,22,.5],care:[0,15,.5],extra:[0,15,.5],cfund:[0,1000,5],cmonthly:[0,10,.1],csend:[0,20,.5],csendY:[0,6,1],crate:[0,7,.5],
  free1:[0,6,1],free2:[0,6,1],extraAllow:[0,5,.1],extraAllowTo:[0,22,1],
  lamount:[0,3000,10],pamount:[0,3000,5],pyear:[2020,2080,1],pmonth:[1,12,1],pevery:[0,20,1],puntil:[2020,2090,1],lyear:[2020,2070,1],lmonth:[1,12,1],lterm:[1,35,1],lrate:[0,15,.1],
  eage:[20,90,1],ecost:[-3000,3000,10],eevery:[0,20,1],euntil:[20,90,1]};
@@ -630,7 +630,7 @@ const FORM=[
  {cat:"年金・退職",icon:"🌸",groups:[["退職",["retireAge","severance"],""],["あなたの年金",["pensionAuto","workStart","stuYears","pension","pensionAge","pensionReal","teikiKosei"],""],["配偶者の年金",["wEmpYears","wStuYears","wPastIncome","wPension","wPensionAge"],""],["保険（万一の備え）",["lifeIns","ipMonthly","ipUntil","diMonthly","diUntil"],"世帯主の保険。もしもの比較の「万一」「働けなくなる」に使います"],["iDeCo・企業型DC",["dc","dcMonthly","dcEnd","dcStart","dcMethod","dcYears","dcRate","dcLow","dcHigh","dcDeduct"],""]]},
  {cat:"住まい・ローン",icon:"🏠",groups:[["住宅ローン",["loanBal","loanRate","loanEndAge","loanPayActual","loanBonus","loanBonusM1","loanBonusM2","loanDeduct","loanDedEnd"],""],["持ち家の維持費",["propTax","homePrice","maintMode","shuzen","shuzenUp"],"固定資産税・火災保険・修繕積立金など"],["追加のローン",[],""],["一括購入",[],""]]},
  {cat:"支出・貯蓄",icon:"🧾",groups:[["毎月の支出",["food","util","house","misc","comm","gas","ins","other","special"],"だいたいの金額で大丈夫です"],["貯蓄",["spendBasis","saveRate"],"今の実績。入力した生活費との差は「内訳に入っていない支出」として毎年計上します"],["老後の支出",["retireRatio"],""],["大きな出費・臨時収入",[],""]]},
- {cat:"資産・運用",icon:"💰",groups:[["貯金・投資",["cash","stock","fund","invest","homeValue"],""],["配偶者名義の資産",["wAssets","wMonthly"],""],["預貯金の割合（年代別）",["cashRatioOn","cr30","cr40","cr50","cr60","cr70"],""],["計算の前提",["ret","retRet","infl","nisaCap","mcSd"],""]]}
+ {cat:"資産・運用",icon:"💰",groups:[["貯金・投資",["cash","stock","fund","invest","homeValue"],""],["配偶者名義の資産",["wAssets","wMonthly"],""],["預貯金の割合（年代別）",["cashRatioOn","cr30","cr40","cr50","cr60","cr70"],""],["計算の前提",["ret","retRet","infl","nisaCap","borrowRate","mcSd"],""]]}
 ];
 let FCAT="家族";
 function renderForm(){
@@ -1032,27 +1032,29 @@ function calcCore(){
     cash+=inc-exp;
     // 足りなければ取り崩し
     let invDraw=0;if(cash<0){const t=Math.min(invA,-cash);invA-=t;cash+=t;invDraw=t}
+    // それでも足りない分は借入（教育ローンなど）でまかなう前提で、利息を計上する
+    let cBorrow=0;if(cash<0){cBorrow=-cash*(v.borrowRate??2.5)/100;cash-=cBorrow}
     // 年代別の預貯金の割合に合わせて調整（リバランス）
     if(v.cashRatioOn){const liq=cash+invA;if(liq>0){const cr=(age<40?v.cr30:age<50?v.cr40:age<60?v.cr50:age<70?v.cr60:v.cr70)/100;cash=liq*cr;invA=liq-cash}}
     const tot=cash+invA+dcA;
-    if(tot<0&&shortAge===null){shortAge=age;add(age,"世帯の資産が底をつく",0,true)}
+    {const av=age<60?cash+invA:tot;if(av<0&&shortAge===null){shortAge=age;add(age,"資金不足が始まる（使えるお金がマイナス）",0,true)}}
     if(tot>peak.val)peak={age,val:tot};
-    rows.push({comp:{liv:cLiv,kids:cKids,edu:cEdu,send:cSend,loan:cLoan,maint:cMaint,tako:takoSave},age,fin:tot,cash,debt:bal+loanBalAll(y*12),wife:wA,kids:kf.slice(),ev:yr,cash0,contribY:contrib,sal,wInc,inc,netW,grossY,ifr,inv0,invC,invGain,invDraw,save:ifr!=null?ifr-(exp-contrib)+kidSaved-kidSaved:null,kd:kidDeltaY,lp,invA,pens:pensNetY,ide:idePay,spend:exp-contrib,gain});
+    rows.push({avail:age<60?cash+invA:tot,comp:{liv:cLiv,kids:cKids,edu:cEdu,send:cSend,loan:cLoan,maint:cMaint,tako:takoSave,borrow:cBorrow},age,fin:tot,cash,debt:bal+loanBalAll(y*12),wife:wA,kids:kf.slice(),ev:yr,cash0,contribY:contrib,sal,wInc,inc,netW,grossY,ifr,inv0,invC,invGain,invDraw,save:ifr!=null?ifr-(exp-contrib)+kidSaved-kidSaved:null,kd:kidDeltaY,lp,invA,pens:pensNetY,ide:idePay,spend:exp-contrib,gain});
   }
   return{rows,shortAge,peak,acc};};
   const SM=sim(0,0,"mid",true),SL=sim(-2,-1,"low",false),SH=sim(2,1,"high",false);
   // 90歳まで資産が「生活費6か月分」を下回らないために、毎月の生活費をいくら変えればよいか（マイナス＝余裕）
   let reqRate=null,reqRows=HC.reqRows,reqCut=HC.reqCut;
-  if(!QUIET&&!LIGHT){reqRows=null;reqCut=null;const reserve=monthlyTotal*6,ok=c=>{v._cut=c;const R=sim(0,0,"mid",false);delete v._cut;return R.rows.slice(1).every(x=>x.fin>=reserve)?R:null};
+  if(!QUIET&&!LIGHT){reqRows=null;reqCut=null;const reserve=monthlyTotal*6,ok=c=>{v._cut=c;const R=sim(0,0,"mid",false);delete v._cut;return R.rows.slice(1).every(x=>x.avail>=reserve)?R:null};
    if(ok(-40)){reqCut=-40}else if(ok(40)){let lo=-40,hi=40;for(let k=0;k<18;k++){const m=(lo+hi)/2;if(ok(m))hi=m;else lo=m}reqCut=Math.ceil(hi*10)/10}
    if(reqCut!=null){v._cut=reqCut;reqRows=sim(0,0,"mid",false).rows;delete v._cut}HC.reqCut=reqCut;HC.reqRows=reqRows}
   // 90歳まで資金が持つ確率（運用成績をランダムに変えて200回試算。乱数は固定なので結果は毎回同じ）
   let mcProb=HC.mcProb,mcP=HC.mcP;
   if(!QUIET&&!LIGHT){let seed=12345;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
-   const N=200,sd=v.mcSd/100,H=END_AGE-v.age+1;let okN=0;const f65=[];
+   const N=200,sd=v.mcSd/100,H=END_AGE-v.age+1;let okN=0,okOld=0;const f65=[];
    for(let k=0;k<N;k++){const RP=[0];for(let y=1;y<=H;y++){const u=rnd()||1e-9,w=rnd();RP.push(sd*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*w))}
-     const R=sim(0,0,"mid",false,RP);if(R.shortAge===null)okN++;const x=R.rows.find(z=>Math.round(z.age)===65)||R.rows[R.rows.length-1];f65.push(x.fin)}
-   mcProb=Math.round(okN/N*100);f65.sort((a,b)=>a-b);mcP={p10:f65[Math.floor(N*.1)],p50:f65[Math.floor(N*.5)],p90:f65[Math.floor(N*.9)]};HC.mcProb=mcProb;HC.mcP=mcP}
+     const R=sim(0,0,"mid",false,RP);if(R.shortAge===null)okN++;if(R.rows.every(z=>z.age<=v.retireAge||z.avail>=0))okOld++;const x=R.rows.find(z=>Math.round(z.age)===65)||R.rows[R.rows.length-1];f65.push(x.fin/Math.pow(1+v.infl/100,x.age-v.age))}
+   mcProb=Math.round(okN/N*100);HC.mcOld=Math.round(okOld/N*100);f65.sort((a,b)=>a-b);mcP={p10:f65[Math.floor(N*.1)],p50:f65[Math.floor(N*.5)],p90:f65[Math.floor(N*.9)]};HC.mcProb=mcProb;HC.mcP=mcP}
   const rows=SM.rows,shortAge=SM.shortAge,peak=SM.peak,acc=SM.acc;
   rows.forEach((x,i)=>{x.lo=SL.rows[i].fin;x.hi=SH.rows[i].fin;x.wlo=SL.rows[i].wife;x.whi=SH.rows[i].wife});
   const shortLo=SL.shortAge;
@@ -1129,7 +1131,7 @@ function calcCore(){
   document.getElementById("verdictNote").textContent=sub;
   document.getElementById("finNote").textContent=`今の金融資産 ${fmt(fin)} の内訳：預貯金 ${fmt(v.cash)}・株式 ${fmt(v.stock)}・投資信託 ${fmt(v.fund)}・iDeCo ${fmt(v.dc)}。iDeCoは原則60歳まで引き出せないため、すぐ使えるお金は ${fmt(fin-v.dc)} です。配偶者名義・子ども名義の資産は含みません。`;
   {const r65=rows.find(x=>Math.round(x.age)===65)||rows[rows.length-1];
-  document.getElementById("kpi").innerHTML=`<div><b>${fmt(fin-v.dc)}</b><span>すぐ使える資産<br>（iDeCo除く）</span></div><div><b>${shortAge?shortAge+"歳":"なし"}</b><span>${shortAge?"資産が底をつく年齢":END_AGE+"歳まで底をつかない"}</span></div><div><b>${fmt(r65.hi)}</b><span>${Math.round(r65.age)}歳時点の最大<br>（運用が良い場合）</span></div><div><b>${fmt(r65.lo)}</b><span>${Math.round(r65.age)}歳時点の最小<br>（運用が悪い場合）</span></div>`;
+  document.getElementById("kpi").innerHTML=`<div><b>${fmt(fin-v.dc)}</b><span>すぐ使える資産<br>（iDeCo除く）</span></div><div><b>${shortAge?shortAge+"歳":"なし"}</b><span>${shortAge?"資金不足が始まる年齢":END_AGE+"歳まで資金不足なし"}</span></div><div><b>${fmt(r65.hi)}</b><span>${Math.round(r65.age)}歳時点の最大<br>（運用が良い場合）</span></div><div><b>${fmt(r65.lo)}</b><span>${Math.round(r65.age)}歳時点の最小<br>（運用が悪い場合）</span></div>`;
   {const n=document.getElementById("kpiNote");const dv=Math.pow(1+v.infl/100,r65.age-v.age);if(n)n.textContent=`${Math.round(r65.age)}歳時点の資産は標準で ${fmt(r65.fin)}。表示は将来のお金の額面で、物価上昇（年${v.infl}%）を除いた今の価値にすると 最大 ${fmt(r65.hi/dv)}・標準 ${fmt(r65.fin/dv)}・最小 ${fmt(r65.lo/dv)} です。最大・最小は運用利回りが現役中±2%・退職後±1%の場合で、ライフイベント・教育費・ローンはすべて反映しています（昇給や貯蓄率は同じ前提）。`;}}
   document.getElementById("nowMetrics").innerHTML=[["貯蓄できている割合",`${rate.toFixed(0)}%`,sRate,`手取り＋手当 約${fmt(net)}のうち、実際に貯まる${fmt(v.actualSave)}の割合。20%以上で良好`],
    ["生活防衛資金",`${emerg.toFixed(1)}か月分`,sEm,"預貯金で生活費を何か月まかなえるか。目安は6か月"],
@@ -1137,8 +1139,13 @@ function calcCore(){
    [`${band[0]}代の平均との比較`,`平均 ${fmt(band[1])}`,sAvg,`今の金融資産 ${fmt(fin)}。参考表示のため総合判定には含めません`],
    (()=>{const Y=new Date().getFullYear(),act=(S.actuals||[]).some(a=>num(a.year)>=Y-1&&num(a.gross)>0&&String(a.spend??"").trim()!==""),lm=new Set((S.ledger||[]).map(e=>String(e.date).slice(0,7))).size,ok=act||lm>=3;
      return ["入力の裏付け",ok?"実績あり":"推定",ok?"ok":"mid",ok?`${act?"年末の実績":""}${act&&lm>=3?"と":""}${lm>=3?`家計簿${lm}か月分`:""}で「実際に貯まる割合」を確かめられています`:"「実際に貯まる割合」は自己申告のままです。5%ずれると65歳時点の資産が大きく変わるので、家計簿を3か月つけるか、年末の実績を入れてください（もしもの比較で影響を確認できます）"]})(),
-   ["90歳まで持たせるための家計の余裕",reqCut==null?"計算できません":reqCut<=0?`月${r1(-reqCut)}万円の余裕`:`月${r1(reqCut)}万円の節約が必要`,reqCut==null?"mid":reqCut<=0?"ok":reqCut<=3?"mid":"ng",reqCut==null?"":reqCut<=0?`毎月の生活費をあと${r1(-reqCut)}万円増やしても、90歳まで資産が生活費6か月分を下回りません`:`毎月の生活費を${r1(reqCut)}万円減らすと、90歳まで資産が生活費6か月分を下回りません`],
-   ["90歳まで資金が持つ確率",mcProb==null?"—":`${mcProb}%`,mcProb==null?"mid":mcProb>=80?"ok":mcProb>=50?"mid":"ng",`運用成績を毎年ランダムに変えて200回試算した結果（ブレ${v.mcSd}%）。65歳時点の資産は 悪い場合 ${fmt(mcP.p10||0)}・中央 ${fmt(mcP.p50||0)}・良い場合 ${fmt(mcP.p90||0)}`]]
+   ["90歳まで持たせるための家計の余裕",reqCut==null?"計算できません":reqCut<=0?`月${r1(-reqCut)}万円の余裕`:`月${r1(reqCut)}万円の節約が必要`,reqCut==null?"mid":reqCut<=0?"ok":reqCut<=3?"mid":"ng",reqCut==null?"":reqCut<=0?`毎月の生活費をあと${r1(-reqCut)}万円増やしても、90歳まで使えるお金（60歳まではiDeCoを除く）が一度も生活費6か月分を下回りません`:`毎月の生活費を${r1(reqCut)}万円減らすと、90歳まで使えるお金（60歳まではiDeCoを除く）が一度も生活費6か月分を下回りません。教育費の時期の不足が原因の場合は、その時期だけの対策（教育費の見直し・配偶者の収入など）でも解消できます`],
+   (()=>{const pre=rows.slice(1).filter(r=>r.age<=v.retireAge),post=rows.filter(r=>r.age>v.retireAge);
+     const mn=pre.reduce((m,r)=>r.avail<m.avail?r:m,{avail:Infinity,age:0}),neg=pre.filter(r=>r.avail<0);
+     return ["教育費・子育て期の資金不足",neg.length?`最大 ${fmt(-mn.avail/Math.pow(1+v.infl/100,mn.age-v.age))}`:"なし",neg.length?(-mn.avail>500?"ng":"mid"):"ok",neg.length?`${neg[0].age}〜${neg[neg.length-1].age}歳ごろ、使えるお金（iDeCoを除く）が足りなくなります。いちばん厳しいのは${mn.age}歳ごろで、不足額は今の価値で${fmt(-mn.avail/Math.pow(1+v.infl/100,mn.age-v.age))}（将来の額面で${fmt(-mn.avail)}）。足りない分は年${v.borrowRate??2.5}%の借入（教育ローンなど）でまかなう前提で利息も計上しています`:"退職するまで、使えるお金がマイナスになる年はありません"]})(),
+   (()=>{const post=rows.filter(r=>r.age>v.retireAge),f=post.find(r=>r.avail<0);return ["老後の資金不足",f?`${f.age}歳ごろから`:"なし",f?"ng":"ok",f?`退職後、${f.age}歳ごろに資産が尽きる見込みです`:"退職後、90歳まで資産は尽きない見込みです"]})(),
+   ["一度も資金不足にならない確率",mcProb==null?"—":`${mcProb}%`,mcProb==null?"mid":mcProb>=80?"ok":mcProb>=50?"mid":"ng",`運用成績を毎年ランダムに変えて200回試算し、今から90歳まで「使えるお金」（60歳まではiDeCoを除く）が一度もマイナスにならなかった割合。教育費の時期の一時的な不足も失敗に数えます`],
+   ["老後（退職後）に資金が尽きない確率",HC.mcOld==null?"—":`${HC.mcOld}%`,HC.mcOld==null?"mid":HC.mcOld>=80?"ok":HC.mcOld>=50?"mid":"ng",`同じ200回の試算で、退職後に一度も資金不足にならなかった割合。65歳時点の資産（今の価値）は 悪い場合 ${fmt(mcP.p10||0)}・中央 ${fmt(mcP.p50||0)}・良い場合 ${fmt(mcP.p90||0)}`]]
    .map(([k,val,st,d])=>`<div class="row"><div class="lbl"><span class="pill c-${st}"></span>${k}<small>${d}</small></div><div class="val">${val}</div></div>`).join("");
   document.getElementById("liqTable").innerHTML=`<thead><tr><th>年代</th><th>時点</th><th>最低ライン</th><th>安心ライン</th><th>予想</th><th>余裕</th><th>いちばん少ない時期</th></tr></thead><tbody>`+
     DEC.map(x=>{const m=x.liqHave-x.liqSafe;return`<tr><td>${x.d}代</td><td>${Math.round(x.a1)}歳</td><td>${Math.round(x.liqNeed).toLocaleString()}</td><td>${Math.round(x.liqSafe).toLocaleString()}</td><td>${Math.round(x.liqHave).toLocaleString()}</td><td class="${m<0?"minus":""}">${m>=0?"+":"−"}${Math.round(Math.abs(m)).toLocaleString()}</td><td>${Math.round(x.liqAt)}歳（${Math.round(x.liqLow).toLocaleString()}）</td></tr>`}).join("")+`</tbody>`;
@@ -1233,9 +1240,9 @@ function calcCore(){
     // 65歳時点の資産の内訳（今の価値）
     {const a0=v.age,end=Math.max(a0+1,65),dvv=r=>Math.pow(1+v.infl/100,r.age-a0),rr=rows.slice(1).filter(r=>r.age<=end);
      const sm=f=>rr.reduce((t,r)=>t+f(r)/dvv(r),0);const inc=sm(r=>r.inc),gain=sm(r=>r.gain||0),C=k=>sm(r=>(r.comp||{})[k]||0),sp=sm(r=>r.spend);
-     const liv=C("liv"),kd=C("kids"),ed=C("edu"),sd=C("send"),ln=C("loan"),mt=C("maint"),tk=C("tako"),oth=sp-liv-kd-ed-sd-ln-mt;
-     const r65=rows.find(r=>Math.round(r.age)===end)||rows[rows.length-1],f0=rows[0].fin,f65=r65.fin/dvv(r65),adj=f65-(f0+inc+gain-sp);
-     const it=[["今の金融資産",f0],["＋ 収入（手取り・手当・退職金・年金など）",inc],["＋ 運用益",gain],["− 大人の生活費",-liv],["− 子どもの生活費",-kd],["− 教育費・保育料",-ed],["− 仕送り",-sd],["− 住宅ローンなどの返済",-ln],["− 持ち家の維持費（値上がり分など）",-mt],["− イベント・一括購入・その他",-oth],["± 物価の換算などの調整",adj]].filter(x=>Math.abs(x[1])>=1||x[0].startsWith("今の"));
+     const liv=C("liv"),kd=C("kids"),ed=C("edu"),sd=C("send"),ln=C("loan"),mt=C("maint"),tk=C("tako"),bw=C("borrow"),oth=sp-liv-kd-ed-sd-ln-mt;
+     const r65=rows.find(r=>Math.round(r.age)===end)||rows[rows.length-1],f0=rows[0].fin,f65=r65.fin/dvv(r65),adj=f65-(f0+inc+gain-sp-bw);
+     const it=[["今の金融資産",f0],["＋ 収入（手取り・手当・退職金・年金など）",inc],["＋ 運用益",gain],["− 大人の生活費",-liv],["− 子どもの生活費",-kd],["− 教育費・保育料",-ed],["− 仕送り",-sd],["− 住宅ローンなどの返済",-ln],["− 持ち家の維持費（値上がり分など）",-mt],["− イベント・一括購入・その他",-oth],["− 資金不足の借入利息",-bw],["± 物価の換算などの調整",adj]].filter(x=>Math.abs(x[1])>=1||x[0].startsWith("今の"));
      const html=`<div style="overflow-x:auto"><table class="audit"><tbody>${it.map(([n,x])=>`<tr><td style="text-align:left">${n}</td><td style="color:${x<0?"var(--red)":"inherit"}">${x>=0?"":"−"}${Math.round(Math.abs(x)).toLocaleString()}</td></tr>`).join("")}<tr style="background:var(--fill)"><td style="text-align:left"><b>＝ ${end}歳時点の金融資産</b></td><td><b>${Math.round(f65).toLocaleString()}</b></td></tr></tbody></table></div><p class="gf" style="margin:6px 12px">今の価値（万円）。今から${end}歳までの合計です。${tk>0.5?`多子世帯の大学無償化で ${fmt(tk)} 軽くなっています（教育費に反映済み）。`:""}「物価の換算などの調整」は、将来の額面を今の価値に直したときの差です。</p>`;
      ["decompBox","sDecompBox"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=html})}}
   try{renderSimple({level,rate,emerg,houseRatio,fin,v,shortAge,rows,DEC,A,net,reqRate,reqRows})}catch(e){console.error(e)}
@@ -1276,7 +1283,7 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
     bar("💰 貯金パワー",`${Math.round(rate)}%`,rate/20*100,"var(--pink)","手取りのうち貯金に回せている割合。20%で満タン")+
     bar("🛡️ ぼうぎょ力",`${emerg.toFixed(1)}か月`,emerg/6*100,"var(--cyan)","急な出費に耐えられる貯金。生活費6か月分で満タン")+
     bar("🏠 ローンの重さ",`${Math.round(houseRatio)}%`,houseRatio/35*100,houseRatio<=25?"var(--lime)":"var(--org)","手取りに対する返済の割合。25%までならOK（バーが短いほど軽い）")+
-    (HC.mcProb!=null?bar("🎲 90歳まで持つ確率",`${HC.mcProb}%`,HC.mcProb,"var(--lime)","運用成績を毎年ランダムに変えて200回試算したうち、お金が最後まで持った割合"):"")+bar("🌸 老後の安心度",shortAge?`${shortAge}歳まで`:`${END_AGE}歳まで安心`,shortAge?Math.max(0,yrs)/(END_AGE-v.retireAge)*100:100,"var(--vio)",shortAge?"このままだとお金が足りなくなる年齢があるよ":`${END_AGE}歳までお金が底をつかない見込み`);
+    (HC.mcOld!=null?bar("🎲 老後に資金が尽きない確率",`${HC.mcOld}%`,HC.mcOld,"var(--lime)",`運用成績を毎年ランダムに変えて200回試算したうち、退職後にお金が尽きなかった割合（教育費の時期も含めて一度も不足しない確率は${HC.mcProb}%）`):"")+(()=>{const os=(rows.find(r=>r.age>v.retireAge&&r.avail<0)||{}).age;return bar("🌸 老後の安心度",os?`${os}歳まで`:`${END_AGE}歳まで安心`,os?Math.max(0,os-v.retireAge)/(END_AGE-v.retireAge)*100:100,"var(--vio)",os?`このままだと退職後${os}歳ごろにお金が尽きるよ`:`${END_AGE}歳まで老後のお金は尽きない見込み${shortAge&&shortAge<=v.retireAge?`（ただし${shortAge}歳ごろ、教育費などで一時的にお金が足りなくなる時期があるよ）`:""}`)})();
   const r65=rows.find(x=>Math.round(x.age)===65)||rows[rows.length-1],dv=Math.pow(1+v.infl/100,r65.age-v.age);
   document.getElementById("sCoins").innerHTML=`<div class="coin"><span>いまの貯金＋投資</span><b>${fmt(fin)}</b></div>
     <div class="coin"><span>${Math.round(r65.age)}歳のお金（今の価値）</span><b>${fmt(r65.fin/dv)}</b></div>
@@ -1303,7 +1310,7 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
        S.children.forEach((k,i)=>{const ka=Math.floor(num(k.age)+off);if(ka>=0)ppl.push([k.cname||"子"+(i+1),ka,PC[2+i%4]])});
        return `<li class="yrow${sYOpen.has(Math.round(r.age))?" open":""}"><div class="ages">${ppl.map(([n,a,c])=>`<span class="evage pb" style="background:${c}">${esc(n)} ${a}歳</span>`).join("")}</div><div class="evname">${evs.length?evs.map(t=>`<div>${esc(t.t)}${t.amt?` <span class="evamt ${t.amt<0?"m":"p"}">${t.amt>0?"+":"−"}${fmt(Math.abs(t.amt))}</span>`:""}</div>`).join(""):""}${cm.map(x=>`<div class="ycm">${x}</div>`).join("")}</div>
          <div class="ybal ydet">${(()=>{const now=r.age===v.age,ifr=now?c.net:r.ifr,sv=now?v.actualSave:r.save;if(ifr==null||sv==null)return"";const rq=reqRows&&reqRows.find(q=>q.age===r.age),tg=rq&&rq.save!=null?Math.max(0,rq.save):0,ok=sv>=tg-1;
-             return `<div class="goal ${ok?"ok":"ng"}">貯蓄 目標 <b>${fmt(tg)}</b><br>${now?"今年":"予想"} <b>${fmt(sv)}</b> <span class="mk">${ok?"✓":"▼"+fmt(tg-sv)}</span></div>`})()}<div>すぐ使えるお金 <b>${fmt(r.cash+(r.invA||0))}</b></div><div>金融資産 <b>${fmt(r.fin-r.cash-(r.invA||0))}</b></div>${r.debt>0.5?`<div class="dbt">ローン ${fmt(r.debt)}</div>`:""}</div></li>`}).join("");
+             return `<div class="goal ${ok?"ok":"ng"}">貯蓄 目標 <b>${fmt(tg)}</b><br>${now?"今年":"予想"} <b>${fmt(sv)}</b> <span class="mk">${ok?"✓":"▼"+fmt(tg-sv)}</span></div>`})()}${r.cash+(r.invA||0)<0?`<div class="dbt">資金不足 <b>${fmt(-(r.cash+(r.invA||0)))}</b></div>`:`<div>すぐ使えるお金 <b>${fmt(r.cash+(r.invA||0))}</b></div>`}<div>金融資産 <b>${fmt(r.fin-r.cash-(r.invA||0))}</b></div>${r.debt>0.5?`<div class="dbt">ローン ${fmt(r.debt)}</div>`:""}</div></li>`}).join("");
      document.getElementById("sStageTip").innerHTML=`<div class="tipbox"><div class="tiphead"><b>${sel.d}代</b>（${Math.round(sel.a0)}〜${Math.round(sel.a1)}歳）</div><div class="tipwhy">${esc(sel.why)}</div><div class="liqbox ${sel.liqHave>=sel.liqSafe?"ok":sel.liqHave>=sel.liqNeed?"mid":"ng"}">💰 ${Math.round(sel.a1)}歳までに貯めたい「すぐ使えるお金」<br>最低 <b>${fmt(sel.liqNeed)}</b>　安心 <b>${fmt(sel.liqSafe)}</b><br>予想 <b>${fmt(sel.liqHave)}</b><br><span style="font-size:11px">いちばん少なくなるのは ${Math.round(sel.liqAt)}歳ごろ（予想 ${fmt(sel.liqLow)}）</span> ${sel.liqHave>=sel.liqSafe?"✓ 安心ラインを達成":sel.liqHave>=sel.liqNeed?"△ 最低ラインはクリア":"▼ "+fmt(sel.liqNeed-sel.liqHave)+"不足"}</div><div style="display:flex;gap:6px;flex-wrap:wrap;margin:6px 0"><button type="button" class="ybtn" id="yList" aria-expanded="${sYList}">${sYList?"1年ごとの一覧を閉じる ▴":"1年ごとの一覧を見る ▾"}</button>${sYList?`<button type="button" class="ybtn" id="yFam" aria-pressed="${sYFam}">${sYFam?"家族の年齢を隠す":"家族の年齢を表示"}</button>`:""}</div>${sYList?`<div class="pnote" style="margin:0 0 4px">貯蓄の目標＝90歳まで資産が生活費6か月分を下回らないために必要な貯蓄額。すぐ使えるお金＝預貯金＋株式・投資信託、金融資産＝iDeCo・企業型DC、ローン＝住宅ローン＋追加ローンの残高</div><ul class="evlist${sYFam?"":" nofam"}">${body}</ul>`:""}</div>`;
      document.querySelectorAll("[data-yb]").forEach(b=>b.addEventListener("click",()=>{const a=+b.dataset.yb,li=b.closest("li");if(sYOpen.has(a))sYOpen.delete(a);else sYOpen.add(a);const o=sYOpen.has(a);if(li)li.classList.toggle("open",o);b.textContent=o?"閉じる ▴":"詳細 ▾";b.setAttribute("aria-expanded",o)}));
      {const yl=document.getElementById("yList");if(yl)yl.addEventListener("click",()=>{sYList=!sYList;renderSimple(c)});const yf=document.getElementById("yFam");if(yf)yf.addEventListener("click",()=>{sYFam=!sYFam;renderSimple(c)})}
@@ -1458,7 +1465,7 @@ document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest
   else if(a==="delete"){if(t.dataset.arm){deleteAlt()}else{t.dataset.arm=1;t.textContent="もう一度タップで削除";setTimeout(()=>{delete t.dataset.arm;t.textContent="このプランを削除"},3000)}}
   else if(a==="adopt"){if(t.dataset.arm){adoptAlt()}else{t.dataset.arm=1;t.textContent="もう一度タップで現状を置き換え";setTimeout(()=>{delete t.dataset.arm;t.textContent="このプランを現状にする"},3000)}}});
 function planSummary(rows,v){const dv=x=>Math.pow(1+v.infl/100,x.age-v.age),fl=rows.slice(1),ret=v.retireAge;
-  const r65=rows.find(r=>Math.round(r.age)===65)||rows[rows.length-1],rE=rows[rows.length-1],sh=rows.find(r=>r.fin<0);
+  const r65=rows.find(r=>Math.round(r.age)===65)||rows[rows.length-1],rE=rows[rows.length-1],sh=rows.find(r=>(r.avail??r.fin)<0);
   const sm=(a,f)=>a.reduce((t,x)=>t+f(x)/dv(x),0),rt=fl.filter(x=>x.age>ret);
   return{f65:r65.fin/dv(r65),fEnd:rE.fin/dv(rE),short:sh?Math.round(sh.age):null,inc:sm(fl,x=>x.inc),spend:sm(fl,x=>x.spend),retGap:sm(rt,x=>x.spend-x.inc),minLiq:Math.min(...rows.map(r=>(r.cash+(r.invA||0))/dv(r))),series:rows.map(r=>({age:r.age,fin:r.fin}))}}
 function planRun(P){const S0=S,gE=document.getElementById,gQ=document.querySelectorAll,AM=ALT_MODE,L0=B0_LOCK;let out=null;B0_LOCK=AM?null:MAIN_INFO;
@@ -1495,7 +1502,7 @@ function renderProposals(){const boxes=[document.getElementById("propBox"),docum
     <tr style="background:var(--fill)"><td style="text-align:left">今の世帯年収</td><td>${Math.round(hh).toLocaleString()}万円</td><td>—</td></tr>
     ${line("最低ライン：90歳まで資産が生活費6か月分を下回らない",P.n1)}${line("ゆとり：90歳の時点で生活費3年分が残る",P.n2)}</tbody></table></div>
     <p class="gf" style="margin:6px 12px">世帯主の年収を増減させて計算した結果です（今の価値）。年収が増えても今の生活費は変わらず、増えた手取りは貯蓄に回る前提です。昇給の予定はそのまま上乗せされます。</p>`;
-  const lst=`<div style="padding:4px 12px 10px"><b>効果の大きい見直し（90歳時点の資産の増え方・今の価値）</b>${P.res.map(x=>`<div style="padding:6px 0;border-bottom:1px dashed var(--sep)">${esc(x.n)}<br><small>90歳の資産 <b style="color:${x.dEnd>=0?"var(--green)":"var(--red)"}">${x.dEnd>=0?"+":"−"}${fmt(Math.abs(x.dEnd))}</b>／65歳の資産 ${x.d65>=0?"+":"−"}${fmt(Math.abs(x.d65))}${P.B.short?`／底をつく年齢 ${P.B.short}歳 → ${x.short?x.short+"歳":"なし"}`:""}</small></div>`).join("")}</div>
+  const lst=`<div style="padding:4px 12px 10px"><b>効果の大きい見直し（90歳時点の資産の増え方・今の価値）</b>${P.res.map(x=>`<div style="padding:6px 0;border-bottom:1px dashed var(--sep)">${esc(x.n)}<br><small>90歳の資産 <b style="color:${x.dEnd>=0?"var(--green)":"var(--red)"}">${x.dEnd>=0?"+":"−"}${fmt(Math.abs(x.dEnd))}</b>／65歳の資産 ${x.d65>=0?"+":"−"}${fmt(Math.abs(x.d65))}${P.B.short?`／資金不足が始まる年齢 ${P.B.short}歳 → ${x.short?x.short+"歳":"なし"}`:""}</small></div>`).join("")}</div>
     <div class="row tap" role="button" tabindex="0" data-propre="1" style="justify-content:center">🔄 今の入力で計算し直す</div>`;
   boxes.forEach(b=>{if(b)b.innerHTML=tbl+lst})}
 document.addEventListener("click",e=>{const re=e.target.closest&&e.target.closest("[data-propre]");if(re){re.textContent="計算中…";setTimeout(runProposals,30);return}
@@ -1511,7 +1518,7 @@ function renderPlanCompare(L){const boxes=[document.getElementById("dPlanCmp"),d
   if(!L||L.length<2){boxes.forEach(b=>{if(b)b.hidden=true});heads.forEach(h=>{if(h)h.hidden=true});return}
   const base=L[0],cell=(x,k,goodUp=true,isAge)=>{const a=base.sum[k],b=x.sum[k];if(isAge)return b?b+"歳":"なし";const d=b-a;
     return `${Math.round(b).toLocaleString()}${x===base?"":`<br><small style="color:${Math.abs(d)<0.5?"inherit":((goodUp?d>0:d<0)?"var(--green)":"var(--red)")}">${d>=0?"+":"−"}${Math.round(Math.abs(d)).toLocaleString()}</small>`}`};
-  const R=[["65歳時点の資産","f65"],["90歳時点の資産","fEnd"],["資産が底をつく年齢","short",true,true],["これからの収入の合計","inc"],["これからの支出の合計","spend",false],["退職後の不足額（合計）","retGap",false],["すぐ使えるお金が最も少ない時","minLiq"]];
+  const R=[["65歳時点の資産","f65"],["90歳時点の資産","fEnd"],["資金不足が始まる年齢","short",true,true],["これからの収入の合計","inc"],["これからの支出の合計","spend",false],["退職後の不足額（合計）","retGap",false],["すぐ使えるお金が最も少ない時","minLiq"]];
   const html=`<div style="overflow-x:auto"><table class="audit"><thead><tr><th>今の価値・万円</th>${L.map((x,i)=>`<th style="color:${PLAN_COLORS[i]}">${esc(x.name)}</th>`).join("")}</tr></thead><tbody>
     ${R.map(([n,k,g,ag])=>`<tr><td style="text-align:left">${n}</td>${L.map(x=>`<td>${cell(x,k,g!==false,ag)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
     <div style="padding:8px 12px;font-size:12.5px;line-height:1.6"><b>現状（基準）からの変更点</b>${L.slice(1).map((x,i)=>`<div style="margin-top:4px"><b style="color:${PLAN_COLORS[i+1]}">${esc(x.name)}</b>：${esc(diffSummary(base.plan,x.plan))}</div>`).join("")}

@@ -276,6 +276,10 @@ body.setup .view{padding-top:12px!important}
 .fpager{display:flex;justify-content:space-between;margin:18px 16px 0}
 .fpb{border:1px solid var(--sep);background:var(--cell);color:var(--tint);font:inherit;font-size:14px;padding:9px 14px;border-radius:12px;cursor:pointer}
 .lmonth{display:flex;align-items:center;justify-content:space-between;margin:4px 16px 10px}.lmonth b{font-size:18px}
+.plannow{margin:10px 16px;padding:10px 12px;border-radius:12px;background:#FFF1DC;border:2px solid #FF9500;font-size:14px;line-height:1.6;color:#231942}
+.ptog{display:flex;align-items:center;width:100%;background:none;border:0;padding:0;font:inherit;color:inherit;text-align:left;cursor:pointer}
+.ptog .chev{margin-left:auto;font-size:12px;color:var(--sub,#5d5577);font-weight:800;white-space:nowrap}
+.pbody[hidden]{display:none}
 .planbar{margin:8px 16px 12px;padding:10px 12px;border-radius:14px;background:var(--cell);border:1px solid var(--sep);display:flex;flex-direction:column;gap:6px}
 .planbar.alt{background:#FFF1DC;border-color:#FF9500}
 @media (prefers-color-scheme: dark){.planbar.alt{background:#3A2A12}}
@@ -294,6 +298,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
 <div id="bootMsg" style="position:fixed;inset:0;display:grid;place-items:center;font:16px -apple-system,sans-serif;color:#8a8a8e;background:#fff;z-index:9999">読み込み中…</div>
 
 <section class="view" id="v-diag">
+  <div class="plannow" hidden></div>
   <h1>診断</h1>
   <div class="group"><div class="status"><div class="dotbig" id="dot">✓</div><div><p class="t" id="verdict"></p><p class="s" id="verdictNote"></p></div></div></div>
   <div class="group" id="nowMetrics" style="margin-top:8px"></div>
@@ -432,6 +437,7 @@ body.alt-mode .topbar{box-shadow:inset 0 -4px 0 #FF9500}
 </section>
 
 <section class="view pop on" id="v-sdiag">
+  <div class="plannow" hidden></div>
   <div class="ptop"><div class="plogo">かけい<span>診断</span>！</div></div>
   <div class="pbox" style="margin-top:18px"><div class="rankrow"><div class="rank" id="sRank"></div><div class="rlabel" id="sRankLbl"></div></div><div class="hero2"><div id="mascot"></div><div class="bubble" id="sBubble"></div></div></div>
   <div class="pbox" id="sDone" style="padding:12px 14px;display:none"></div>
@@ -798,12 +804,13 @@ function ageFrom(b,frac){if(!b)return null;const d=new Date(b+"T00:00:00");if(is
   if(frac)return Math.round((n-d)/(365.2425*864e5)*10)/10;let a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a}
 function applyBirthdays(){const a=ageFrom(S.v.myBirth);if(a!=null)S.v.age=String(a);const w=ageFrom(S.v.spBirth);if(w!=null)S.v.wAge=String(w);
   (S.children||[]).forEach(c=>{const x=ageFrom(c.cbirth,true);if(x!=null)c.age=String(x)})}
-const APP_VERSION="37",APP_UPDATED="2026年10月26日";
+const APP_VERSION="38",APP_UPDATED="2026年10月26日";
 let QUIET=false,LIGHT=false,HT=null,BOOT=true;const HC={reqCut:null,reqRows:null,mcProb:null,mcP:{}};
 function calcLight(){LIGHT=true;try{calc()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>calc(),700)}
 // 起動直後は軽い計算だけで画面を出し、重い計算（確率・必要な節約額・比較プラン）は少し後に1回だけ行う
 function calc(){if(BOOT&&!QUIET&&!LIGHT&&!CMP_SKIP){LIGHT=true;try{calcCore()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>{BOOT=false;calc()},900);return}calcCore()}
 function calcCore(){
+  if(!QUIET)document.querySelectorAll(".plannow").forEach(e=>{const on=ALT_MODE&&S.alts&&S.alts[ALT_IDX];if(on){e.hidden=false;e.innerHTML=`🟧 いま表示しているのは比較プラン「<b>${esc(S.alts[ALT_IDX].name)}</b>」の診断結果です<br><small>現状プランに戻すには、入力画面の上のタブで「現状」を選んでください</small>`}else if((S.alts||[]).length){e.hidden=false;e.innerHTML="📘 いま表示しているのは<b>現状プラン</b>の診断結果です"}else e.hidden=true});
   if(!QUIET)document.querySelectorAll(".appver").forEach(e=>{e.textContent=`${APP_VERSION}（${APP_UPDATED}更新）`});
   {const bm=document.getElementById("bootMsg");if(bm&&bm.remove&&!QUIET)bm.remove()}
   applyBirthdays();if(!S.v._klaMig2){if(S.v.kidLiveAdj==null||S.v.kidLiveAdj===""||(S.v._klaMig&&String(S.v.kidLiveAdj)==="80"&&!S.v.kidLiveBase))S.v.kidLiveAdj="100";S.v._klaMig2=true}KLA=num(S.v.kidLiveAdj);KLM=S.v.kidLiveMode==="今の生活費に含めて固定";KLB=KID_BASE[S.v.kidLiveBase]?S.v.kidLiveBase:"控えめ（2009年調査を物価で補正）";
@@ -1360,7 +1367,8 @@ function sF(k,label,unit,hint,rng){const val=sGet(k),n=num(val),[mn,mx,st]=rng,l
   return `<div class="sfld"><div class="top"><div class="lb">${label}${hint?`<small>${hint}</small>`:""}</div><input type="text" inputmode="decimal" data-sk="${k}" value="${esc(val)}" aria-label="${label}"><span class="u">${unit}</span></div>
   <input class="rng" type="range" min="${lo}" max="${hi}" step="${st}" value="${n}" style="--p:${pc}%" data-sk="${k}" data-r="1" aria-label="${label}（スライダー）"></div>`}
 function renderSInput(){const box=document.getElementById("sform");if(!box)return;
-  const card=(em,t,body)=>`<div class="pbox"><div class="ptitle"><span class="em">${em}</span>${t}</div>${body}</div>`;
+  const closed=new Set((()=>{try{return JSON.parse(localStorage.getItem("lifeplan-cards-closed")||"[]")}catch(e){return []}})());
+  const card=(em,t,body)=>{const c=closed.has(t);return `<div class="pbox"><button type="button" class="ptitle ptog" data-card="${t}" aria-expanded="${!c}"><span class="em">${em}</span>${t}<span class="chev">${c?"▾ ひらく":"▴ とじる"}</span></button><div class="pbody"${c?" hidden":""}>${body}</div></div>`};
   let h="";
   h+=card("🧑","あなた",sT("myName","名前","text","")+sT("myBirth","生年月日","date","入れると年齢を自動で計算")+sF("age","年齢","歳","",[20,70,1])+sF("gross","年収（額面）","万円","ボーナス込み・税金が引かれる前",[0,2000,10])+`<div class="pnote" id="sNetInfo" style="margin:0 0 8px"></div>`+((S.raises||[]).length<=1?sF("raiseSimple","昇給率（毎年）","%","くわしい入力で期間ごとに変えられます",[-5,10,.5]):`<div class="pnote" style="margin:0 0 8px">昇給：${raisePreview().split("。")[0]}（くわしい入力で変更）</div>`)+sF("retireAge","退職する年齢","歳","",[50,75,1])+sF("severance","退職金の見込み","万円","分からなければ0",[0,5000,50])+(S.v.pensionAuto!==false?`<div class="sfld"><div class="top"><div class="lb">年金の見込み（月）<small>年収と働く期間から自動で計算（今の価値）</small></div><b id="sPens" style="font:18px DotGothic16,monospace"></b></div></div>`:sF("pension","年金の見込み（月）","万円","ねんきん定期便の金額が目安",[0,40,.5])));
   h+=card("💑","配偶者",sS("hasSpouseSel","配偶者",["いる","いない"])+sT("spName","名前","text","")+sT("spBirth","生年月日","date","入れると年齢を自動で計算")+sF("wAge","配偶者の年齢","歳","",[20,70,1])+sF("spouse","配偶者の今の年収","万円","いない・専業主婦（夫）なら0",[0,1500,10])+sF("wReturn","これから働き始めるのは","年後","予定がなければ0",[0,20,1])+sF("wFuture","働き始めた後の年収","万円","パートなら100万前後、正社員なら300万〜など",[0,1500,10])+sF("wSaveRate","そのうち貯蓄に回す割合","%","100なら全額貯蓄。残りは生活費が増える",[0,100,5])+sF("wWorkTo","何歳まで働くか","歳","",[40,75,1])+sF("wEmpYears","これまで会社員だった年数","年","年金の自動計算に使います",[0,45,1])+sF("wPastIncome","その頃の年収","万円","",[0,1000,10]));
@@ -1532,17 +1540,18 @@ const PLAN_COLORS=["var(--tint)","#FF9500","#AF52DE","#34C759","#FF2D55","#5AC8F
 function diffSummary(A,B){const d=planDiff(A,B);if(!d.length)return "変更なし";return d.slice(0,4).join("、")+(d.length>4?` ほか${d.length-4}件`:"")}
 function renderPlanCompare(L){const boxes=[document.getElementById("dPlanCmp"),document.getElementById("sPlanCmp")],heads=[document.getElementById("dPlanCmpH"),document.getElementById("sPlanCmpH")];
   if(!L||L.length<2){boxes.forEach(b=>{if(b)b.hidden=true});heads.forEach(h=>{if(h)h.hidden=true});return}
+  const selI=ALT_MODE?Math.max(0,L.findIndex((x,i)=>i>0&&x.name===(S.alts[ALT_IDX]||{}).name)):0,nm=(x,i)=>esc(x.name)+(i===selI?"（表示中）":"");
   const base=L[0],cell=(x,k,goodUp=true,isAge)=>{const a=base.sum[k],b=x.sum[k];if(isAge)return b?b+"歳":"なし";const d=b-a;
     return `${Math.round(b).toLocaleString()}${x===base?"":`<br><small style="color:${Math.abs(d)<0.5?"inherit":((goodUp?d>0:d<0)?"var(--green)":"var(--red)")}">${d>=0?"+":"−"}${Math.round(Math.abs(d)).toLocaleString()}</small>`}`};
   const R=[["65歳時点の資産","f65"],["90歳時点の資産","fEnd"],["資金不足が始まる年齢","short",true,true],["これからの収入の合計","inc"],["これからの支出の合計","spend",false],["退職後の不足額（合計）","retGap",false],["すぐ使えるお金が最も少ない時","minLiq"]];
-  const html=`<div style="overflow-x:auto"><table class="audit"><thead><tr><th>今の価値・万円</th>${L.map((x,i)=>`<th style="color:${PLAN_COLORS[i]}">${esc(x.name)}</th>`).join("")}</tr></thead><tbody>
+  const html=`<div style="overflow-x:auto"><table class="audit"><thead><tr><th>今の価値・万円</th>${L.map((x,i)=>`<th style="color:${PLAN_COLORS[i]};${i===selI?"text-decoration:underline;":""}">${i===selI?"▶ ":""}${nm(x,i)}</th>`).join("")}</tr></thead><tbody>
     ${R.map(([n,k,g,ag])=>`<tr><td style="text-align:left">${n}</td>${L.map(x=>`<td>${cell(x,k,g!==false,ag)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>
     <div style="padding:8px 12px;font-size:12.5px;line-height:1.6"><b>現状（基準）からの変更点</b>${L.slice(1).map((x,i)=>`<div style="margin-top:4px"><b style="color:${PLAN_COLORS[i+1]}">${esc(x.name)}</b>：${esc(diffSummary(base.plan,x.plan))}</div>`).join("")}
     <div style="color:var(--sec);margin-top:6px">※比較プランでは、年収などを変えても今の生活費は現状と同じとみなします（支出の内訳・貯まる割合を変えた分だけ増減）</div></div>
-    <div class="chart" id="planCmpChart"></div><div class="legend">${L.map((x,i)=>`<span><i style="background:${PLAN_COLORS[i]}"></i>${esc(x.name)}</span>`).join("")}</div>`;
+    <div class="chart" id="planCmpChart"></div><div class="legend">${L.map((x,i)=>`<span style="${i===selI?"font-weight:800":""}"><i style="background:${PLAN_COLORS[i]};${i===selI?"height:5px":""}"></i>${nm(x,i)}</span>`).join("")}</div><p class="gf" style="margin:4px 12px 8px">太い実線が、いま表示・編集しているプラン（${esc(L[selI].name)}）です。ほかのプランは点線です。</p>`;
   boxes.forEach(b=>{if(b){b.hidden=false;b.innerHTML=html}});heads.forEach(h=>{if(h)h.hidden=false});
   const ser=base.sum.series.map((x,i)=>{const o={age:x.age};L.forEach((p,j)=>o["p"+j]=(p.sum.series[i]||{}).fin);return o});
-  try{document.querySelectorAll("#planCmpChart").forEach((el,i)=>{el.id="planCmpChart"+i;drawChart(el.id,ser,L.map((p,j)=>({k:"p"+j,c:PLAN_COLORS[j],w:j?2:3,l:p.name})),{})})}catch(e){}}
+  try{document.querySelectorAll("#planCmpChart").forEach((el,i)=>{el.id="planCmpChart"+i;drawChart(el.id,ser,L.map((p,j)=>({k:"p"+j,c:PLAN_COLORS[j],w:j===selI?4:2,d:j===selI?null:"5 4",l:p.name+(j===selI?"（表示中）":"")})),{})})}catch(e){}}
 /* ===== AIに渡す用のまとめ（名前・生年月日は含めない） ===== */
 function buildAIReport(){
   // 入力画面を開いていなくても計算の説明文を取れるよう、一時的に受け皿を作って計算し直す
@@ -1579,6 +1588,9 @@ function showAIReport(){const txt=buildAIReport();let ov=document.getElementById
   const dl=ov.querySelector("#aiDl");if(dl)dl.onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([txt],{type:"text/markdown"}));a.download=`わが家のライフプラン_${new Date().toISOString().slice(0,10)}.md`;document.body.appendChild(a);a.click();a.remove()}}
 document.addEventListener("click",e=>{const c=e.target.closest&&e.target.closest("[data-cartpl]");if(!c)return;const Y=new Date().getFullYear();S.purchases=S.purchases||[];S.purchases.push({pname:"車の買い替え（1台目）",pamount:"250",pyear:String(Y+2),pmonth:"4",pevery:"10",puntil:String(Y+40),pfixed:false},{pname:"車の買い替え（2台目）",pamount:"200",pyear:String(Y+7),pmonth:"4",pevery:"10",puntil:String(Y+40),pfixed:false});persist();renderForm();calc();toast("車2台の買い替えを追加しました。年や金額は自由に変えられます")});
 document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest("[data-aireport]");if(!t)return;showAIReport()});
+document.addEventListener("click",e=>{const t=e.target.closest&&e.target.closest(".ptog[data-card]");if(!t)return;const body=t.nextElementSibling,open=body.hidden;body.hidden=!open;t.setAttribute("aria-expanded",open);
+  const ch=t.querySelector(".chev");if(ch)ch.textContent=open?"▴ とじる":"▾ ひらく";
+  let L=[];try{L=JSON.parse(localStorage.getItem("lifeplan-cards-closed")||"[]")}catch(x){}L=L.filter(k=>k!==t.dataset.card);if(!open)L.push(t.dataset.card);try{localStorage.setItem("lifeplan-cards-closed",JSON.stringify(L))}catch(x){}});
 let SCEN_RES=null,SCEN_OPEN=false;const SCEN_INTRO_D=`<div class="row"><div class="lbl">今の計画と「もしも」を並べて比べます<small>昇給が低い・金利上昇・私立進学・貯まる割合・運用悪化・世帯主の万一・働けなくなる</small></div></div>`,SCEN_INTRO_S="今の計画と「もしも」を並べて比べるよ。";
 function runScenarios(){const S0=S,gE=document.getElementById,gQ=document.querySelectorAll;const res=[];
   const dummy={innerHTML:"",textContent:"",value:"",hidden:false,style:{setProperty(){}},dataset:{},classList:{add(){},remove(){},toggle(){}},addEventListener(){},setAttribute(){},querySelector:()=>null,querySelectorAll:()=>[],contains:()=>false,after(){}};

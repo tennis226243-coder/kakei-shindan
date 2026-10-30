@@ -804,7 +804,7 @@ function ageFrom(b,frac){if(!b)return null;const d=new Date(b+"T00:00:00");if(is
   if(frac)return Math.round((n-d)/(365.2425*864e5)*10)/10;let a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a}
 function applyBirthdays(){const a=ageFrom(S.v.myBirth);if(a!=null)S.v.age=String(a);const w=ageFrom(S.v.spBirth);if(w!=null)S.v.wAge=String(w);
   (S.children||[]).forEach(c=>{const x=ageFrom(c.cbirth,true);if(x!=null)c.age=String(x)})}
-const APP_VERSION="40",APP_UPDATED="2026年10月26日";
+const APP_VERSION="41",APP_UPDATED="2026年10月26日";
 let QUIET=false,LIGHT=false,HT=null,BOOT=true;const HC={reqCut:null,reqRows:null,mcProb:null,mcP:{}};
 function calcLight(){LIGHT=true;try{calc()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>calc(),700)}
 // 起動直後は軽い計算だけで画面を出し、重い計算（確率・必要な節約額・比較プラン）は少し後に1回だけ行う
@@ -1982,7 +1982,13 @@ let LM=(()=>{const d=new Date();return d.getFullYear()*12+d.getMonth()})(),LFORM
 const ymKey=m=>`${Math.floor(m/12)}-${String(m%12+1).padStart(2,"0")}`;
 function monthlyBudget(){const v=S.v;return ["food","util","house","misc","comm","gas","ins","other"].reduce((s,k)=>s+num(v[k]),0)+num(v.special)/12}
 function ledgerYear(y){const L=(S.ledger||[]).filter(e=>String(e.date).startsWith(y+"-"));const ms=new Set(L.map(e=>String(e.date).slice(0,7)));const sum=L.reduce((s,e)=>s+num(e.amount),0)/10000;
-  const months=ms.size,fill=(12-months)*monthlyBudget();return{months,sum,fill,total:sum+fill}}
+  const months=ms.size,fill=(12-months)*monthlyBudget();
+  // 途中経過：今年なら、今月はまだ途中なので月平均からは除く（今月しか入力がない場合は今月も使う）
+  const now=new Date(),curKey=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`,isCur=y===now.getFullYear();
+  const done=[...ms].filter(k=>!(isCur&&k===curKey)),useM=done.length?done:[...ms],useSum=L.filter(e=>useM.includes(String(e.date).slice(0,7))).reduce((s,e)=>s+num(e.amount),0)/10000;
+  const avgM=useM.length?useSum/useM.length:0,keys=[...ms].sort();
+  return{months,sum,fill,total:sum+fill,avgM,annual:avgM*12,isCur,first:keys[0],last:keys[keys.length-1],avgN:useM.length}}
+function ledgerSpend(a){const lg=ledgerYear(num(a.year));return a.spendAuto==="avg"?lg.annual:lg.total}
 function renderLedger(){const box=document.getElementById("ledgerPane");if(!box)return;S.ledger=S.ledger||[];
   const key=ymKey(LM),rows=S.ledger.filter(e=>String(e.date).startsWith(key)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
   const byCat={};rows.forEach(e=>{byCat[e.cat]=(byCat[e.cat]||0)+num(e.amount)});const total=rows.reduce((s,e)=>s+num(e.amount),0);
@@ -2049,7 +2055,7 @@ function makeBaseline(){const rows=lastLiveRows(),Y=new Date().getFullYear(),v=S
     out.push({year:yy,spend:yy===Y?(NOW_FLOW?NOW_FLOW.spend:null):ri.spend,gross:yy===Y?num(v.gross):ri.grossY||0,net:yy===Y?null:ri.netW||null,fin:lerp("fin",t),debt:lerp("debt",t)})}
   S.baseline={createdAt:new Date().toISOString(),rows:out};persist();renderActuals();toast("今の予想を基準にしました")}
 function actDerived(a){const net=num(a.gross)-num(a.wtax)-num(a.social)-num(a.rtax),fin=num(a.cash)+num(a.invest)+num(a.dc);
-  let spend=String(a.spend??"").trim()!==""?num(a.spend):null,est=false;
+  let spend=a.spendAuto&&ledgerYear(num(a.year)).months?ledgerSpend(a):String(a.spend??"").trim()!==""?num(a.spend):null,est=false;
   if(spend==null){const prev=(S.actuals||[]).find(x=>num(x.year)===num(a.year)-1);if(prev){const pf=num(prev.cash)+num(prev.invest)+num(prev.dc);spend=Math.max(0,net+num(a.spouseInc)-(fin-pf));est=true}}
   return{net,fin,debt:num(a.loanBal),spend,est}}
 let actOpen=null,CALIB=null;
@@ -2065,8 +2071,8 @@ function renderActuals(){const box=document.getElementById("actPane");if(!box)re
   if(cmp.length){h+=`<div class="gh">予想とのズレ（万円）</div><div class="group"><div style="overflow-x:auto"><table class="audit"><thead><tr><th>年</th><th>項目</th><th>予想</th><th>実績</th><th>差</th></tr></thead><tbody>`;
     const cell=(lab,p,act,goodUp=true)=>{if(p==null||!isFinite(p))return`<tr><td></td><td>${lab}</td><td>–</td><td>${Math.round(act).toLocaleString()}</td><td>–</td></tr>`;const df=act-p,pc=p?df/Math.abs(p)*100:0,bad=goodUp?pc<-3:pc>3;
       return`<tr><td></td><td>${lab}</td><td>${Math.round(p).toLocaleString()}</td><td>${Math.round(act).toLocaleString()}</td><td class="${bad?"minus":""}" style="${!bad&&Math.abs(pc)>3?"color:var(--green)":""}">${df>=0?"+":""}${Math.round(df).toLocaleString()}（${pc>=0?"+":""}${pc.toFixed(0)}%）</td></tr>`};
-    cmp.forEach(({a,d,br})=>{h+=`<tr><td colspan="5" style="text-align:left;font-weight:600;background:var(--fill)">${num(a.year)}年末</td></tr>`+
-      cell("年収（額面）",br&&br.gross,num(a.gross))+cell("手取り",br&&br.net,d.net+num(a.spouseInc))+cell("金融資産",br&&br.fin,d.fin)+cell("住宅ローン残高",br&&br.debt,d.debt,false)+(d.spend!=null?cell(`年間支出${d.est?"（推定）":""}`,br&&br.spend,d.spend,false):"")});
+    cmp.forEach(({a,d,br})=>{h+=`<tr><td colspan="5" style="text-align:left;font-weight:600;background:var(--fill)">${num(a.year)}年末${num(a.year)===Y?"（途中経過）":""}</td></tr>`+
+      cell("年収（額面）",br&&br.gross,num(a.gross))+cell("手取り",br&&br.net,d.net+num(a.spouseInc))+cell("金融資産",br&&br.fin,d.fin)+cell("住宅ローン残高",br&&br.debt,d.debt,false)+(d.spend!=null?cell(`年間支出${d.est?"（推定）":a.spendAuto?"（家計簿から）":""}`,br&&br.spend,d.spend,false):"")});
     h+=`</tbody></table></div></div>`;
     const last=cmp[cmp.length-1];if(last.br){const df=last.d.fin-last.br.fin,pc=df/Math.max(1,Math.abs(last.br.fin))*100;
       const msg=Math.abs(pc)<=3?"金融資産はほぼ予想どおりです。今のライフプランのままで大丈夫です。":df<0?`金融資産が予想より${fmt(-df)}少なくなっています。「実際に貯まる割合」や生活費、昇給の予定が実際と合っているか見直してみてください。`:`金融資産が予想より${fmt(df)}多くなっています。貯蓄が順調です。「実際に貯まる割合」を実績に合わせて上げると、これからの見通しがより正確になります。`;
@@ -2083,9 +2089,14 @@ function renderActuals(){const box=document.getElementById("actPane");if(!box)re
        <div class="row tap" role="button" tabindex="0" id="applyCalib">この実績で前提（昇給率${srA!=null?"・実際に貯まる割合":""}）を更新</div></div>
        <p class="gf">昇給の予定は「来年から収入が下がる年齢まで、実績の昇給率が続く」1つの期間に置き換わります。</p>`}}
   // 入力フォーム
+  {const lg=ledgerYear(Y);if(lg.months){const ex=S.actuals.findIndex(a=>num(a.year)===Y),au=ex>=0&&S.actuals[ex].spendAuto;
+    h+=`<div class="gh">今年（${Y}年）の家計簿の途中経過</div><div class="group"><div class="row"><div class="lbl"><b>${lg.first.slice(5)*1}月〜${lg.last.slice(5)*1}月：合計 ${fmt(lg.sum)}</b><small>月平均 ${r1(lg.avgM)}万円${lg.avgN<lg.months?"（今月は途中のため平均から除く）":""}。年間の見込みは ① 月平均×12 ＝ ${fmt(lg.annual)}、② 残りの月を「毎月の支出」で補う ＝ ${fmt(lg.total)}。今の入力の年間支出の見込みは ${fmt(NOW_FLOW?NOW_FLOW.spend:0)}${au?`<br>🔗 ${Y}年の実績は家計簿と連動中です`:""}</small></div></div>
+    ${au?"":`<div class="row tap" role="button" tabindex="0" data-ytd="avg">${Y}年の実績に反映する（① 月平均×12・家計簿と連動）</div><div class="row tap" role="button" tabindex="0" data-ytd="fill">${Y}年の実績に反映する（② 毎月の支出で補う・家計簿と連動）</div>`}</div>
+    <p class="gf">反映すると、${Y}年の実績の「1年間の支出」が家計簿と連動し、家計簿を入力するたびに更新されます。年末の残高や源泉徴収票の値は、分かった時点で入れてください。家計簿に住宅ローン・保険・保育料などの引き落としを入れていない場合は、その分だけ少なく出るので、実績と比べるときは注意してください。</p>`}}
   h+=`<div class="gh">年末の実績</div>`;
   S.actuals.forEach((a,i)=>{const op=actOpen===i;h+=`<div class="group" style="margin-bottom:8px"><div class="row" role="button" tabindex="0" data-aopen="${i}" style="cursor:pointer"><div class="lbl"><b>${num(a.year)}年</b><small>手取り ${fmt(actDerived(a).net)}・金融資産 ${fmt(actDerived(a).fin)}</small></div><span class="chev">${op?"⌃":"⌄"}</span></div>`+
-    (op?(()=>{const lg=ledgerYear(num(a.year));return lg.months?`<div class="row"><div class="lbl"><b>家計簿の入力値</b><small>${lg.months}か月分の入力 ${fmt(lg.sum)}＋入力のない${12-lg.months}か月は毎月の支出（${r1(lg.fill/Math.max(1,12-lg.months))}万円）で補完 ＝ 年間 ${fmt(lg.total)}</small></div></div><div class="row tap" role="button" tabindex="0" data-lgapply="${i}">「1年間の支出」に家計簿の入力値を反映</div>`:""})()+cell("year","年",a.year,"年","",`data-act="${i}" data-af="year"`)+ACT_F.map(([k,l,hint])=>cell("act_"+k,l,a[k]??"","万円",hint,`data-act="${i}" data-af="${k}"`)).join("")+
+    (op?(()=>{const lg=ledgerYear(num(a.year));return lg.months?`<div class="row"><div class="lbl"><b>家計簿の入力値${lg.isCur?"（今年の途中経過）":""}</b><small>${lg.first?.slice(5)*1}月〜${lg.last?.slice(5)*1}月の${lg.months}か月分 合計 ${fmt(lg.sum)}・月平均 ${r1(lg.avgM)}万円${lg.isCur&&lg.avgN<lg.months?"（今月は途中のため平均から除く）":""}<br>年間の見込み：① 月平均×12 ＝ ${fmt(lg.annual)}／② 入力のない${12-lg.months}か月を毎月の支出（${r1(lg.fill/Math.max(1,12-lg.months))}万円）で補う ＝ ${fmt(lg.total)}${a.spendAuto?`<br>🔗 いまは家計簿と連動中（${a.spendAuto==="avg"?"①":"②"}）。家計簿を入力するたびに自動で更新されます。「1年間の支出」を直接入れると連動は解除されます`:""}</small></div></div>
+      <div class="row tap" role="button" tabindex="0" data-lgapply="${i}" data-lgmode="avg">① 月平均×12 を「1年間の支出」にする（家計簿と連動）</div><div class="row tap" role="button" tabindex="0" data-lgapply="${i}" data-lgmode="fill">② 毎月の支出で補った額を「1年間の支出」にする（家計簿と連動）</div>`:""})()+cell("year","年",a.year,"年","",`data-act="${i}" data-af="year"`)+ACT_F.map(([k,l,hint])=>cell("act_"+k,l,a[k]??"","万円",hint,`data-act="${i}" data-af="${k}"`)).join("")+
       `<div class="row tap" role="button" tabindex="0" data-apply="${i}">この実績で今の入力（資産・ローン残高・年収）を更新</div><div class="row tap danger" role="button" tabindex="0" data-adel="${i}">この年の実績を削除</div>`:"")+`</div>`});
   h+=`<div class="group"><div class="row tap" role="button" tabindex="0" id="addAct">＋ ${(()=>{const ys=S.actuals.map(a=>num(a.year));let yy=Y;while(ys.includes(yy))yy--;return yy})()}年の実績を入力</div></div><p class="gf">源泉徴収票は年末調整のあと（12月〜1月）に会社から届きます。手取りは「支払金額 − 源泉徴収税額 − 社会保険料等 − 住民税」で計算します。</p>`;
   box.innerHTML=h;
@@ -2102,7 +2113,9 @@ function renderActuals(){const box=document.getElementById("actPane");if(!box)re
   act(document.getElementById("addAct"),()=>{const yrs=S.actuals.map(a=>num(a.year));let yy=Y;while(yrs.includes(yy))yy--;const v=S.v;
     S.actuals.push({year:String(yy),gross:String(v.gross),wtax:"",social:"",rtax:"",spouseInc:"0",cash:String(v.cash),invest:String(num(v.stock)+num(v.fund)),dc:String(v.dc),loanBal:String(v.loanBal)});actOpen=S.actuals.length-1;
     if(!S.baseline)makeBaseline();else{persist();renderActuals()}});
-  box.querySelectorAll("[data-lgapply]").forEach(el=>act(el,()=>{const a=S.actuals[+el.dataset.lgapply];a.spend=String(Math.round(ledgerYear(num(a.year)).total));persist();renderActuals();toast("家計簿の入力値を反映しました")}));
+  box.querySelectorAll("[data-lgapply]").forEach(el=>act(el,()=>{const a=S.actuals[+el.dataset.lgapply];a.spendAuto=el.dataset.lgmode||"fill";a.spend=String(Math.round(ledgerSpend(a)));persist();renderActuals();toast("家計簿の入力値を反映しました。これからは家計簿と連動します")}));
+  box.querySelectorAll("[data-ytd]").forEach(el=>act(el,()=>{const Y=new Date().getFullYear();let i=S.actuals.findIndex(a=>num(a.year)===Y);if(i<0){S.actuals.push({year:String(Y)});i=S.actuals.length-1}
+    const a=S.actuals[i];a.spendAuto=el.dataset.ytd;a.spend=String(Math.round(ledgerSpend(a)));actOpen=i;persist();renderActuals();toast(`${Y}年の実績に反映しました（家計簿と連動）`)}));
   box.querySelectorAll("[data-aopen]").forEach(el=>act(el,()=>{const i=+el.dataset.aopen;actOpen=actOpen===i?null:i;renderActuals()}));
   box.querySelectorAll("[data-adel]").forEach(el=>act(el,()=>{S.actuals.splice(+el.dataset.adel,1);actOpen=null;persist();renderActuals()}));
   box.querySelectorAll("[data-apply]").forEach(el=>{let arm=false;act(el,()=>{if(!arm){arm=true;el.textContent="もう一度タップで今の入力を更新";setTimeout(()=>{arm=false;el.textContent="この実績で今の入力（資産・ローン残高・年収）を更新"},3000);return}
@@ -2112,7 +2125,7 @@ function renderActuals(){const box=document.getElementById("actPane");if(!box)re
   box.querySelectorAll("input,select").forEach(el=>{const upd=()=>{const i=+el.dataset.act,k=el.dataset.af,row=el.closest(".row");let val=el.value;
       if(el.dataset.r){const b=row.querySelector(".box");if(b)b.value=val}else{const r=row.querySelector(".rng");if(r){const n=num(val);if(n>+r.max)r.max=n;r.value=n}}
       const r=row.querySelector(".rng");if(r)r.style.setProperty("--p",((r.value-r.min)/(r.max-r.min)*100)+"%");
-      S.actuals[i][k]=val;persist();};
+      S.actuals[i][k]=val;if(k==="spend")delete S.actuals[i].spendAuto;persist();};
     el.addEventListener("change",()=>{upd();renderActuals()});el.addEventListener("input",upd)});
 }
 let openId=null,delArm=null;

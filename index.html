@@ -804,7 +804,7 @@ function ageFrom(b,frac){if(!b)return null;const d=new Date(b+"T00:00:00");if(is
   if(frac)return Math.round((n-d)/(365.2425*864e5)*10)/10;let a=n.getFullYear()-d.getFullYear();if(n.getMonth()<d.getMonth()||(n.getMonth()===d.getMonth()&&n.getDate()<d.getDate()))a--;return a}
 function applyBirthdays(){const a=ageFrom(S.v.myBirth);if(a!=null)S.v.age=String(a);const w=ageFrom(S.v.spBirth);if(w!=null)S.v.wAge=String(w);
   (S.children||[]).forEach(c=>{const x=ageFrom(c.cbirth,true);if(x!=null)c.age=String(x)})}
-const APP_VERSION="41",APP_UPDATED="2026年10月26日";
+const APP_VERSION="42",APP_UPDATED="2026年10月26日";
 let QUIET=false,LIGHT=false,HT=null,BOOT=true;const HC={reqCut:null,reqRows:null,mcProb:null,mcP:{}};
 function calcLight(){LIGHT=true;try{calc()}finally{LIGHT=false}clearTimeout(HT);HT=setTimeout(()=>calc(),700)}
 // 起動直後は軽い計算だけで画面を出し、重い計算（確率・必要な節約額・比較プラン）は少し後に1回だけ行う
@@ -1320,7 +1320,8 @@ function renderSimple(c){const {level,rate,emerg,houseRatio,fin,v,shortAge,rows,
      const KO=S.children.map(c=>({age:num(c.age),univ:c.univ,hs:c.hs||"公立",grad:c.grad||"進学しない",gradType:c.gradType||"国立",send:num(c.csend),sendY:c.csendY==null?4:num(c.csendY),name:c.cname}));
      // 各年のひとこと：在学中の子どもの学年と学費、仕送り、その年の家計の状態
      const yComments=r=>{const y=r.age-v.age,f=Math.pow(1+v.infl/100,y),out=[];
-       if(r.inc!=null&&r.spend!=null){const d=r.inc-r.spend;out.push(`📊 収入 ${fmt(r.inc)}／支出 ${fmt(r.spend)}／<b style="color:${d<0?"#E0356F":"#23A04A"}">収支 ${d>=0?"+":"−"}${fmt(Math.abs(d))}</b>`);
+       if(r.inc!=null&&r.spend!=null){const d=r.inc-r.spend;out.push(`📊 収入（手取り）${fmt(r.inc)}／支出 ${fmt(r.spend)}／<b style="color:${d<0?"#E0356F":"#23A04A"}">収支 ${d>=0?"+":"−"}${fmt(Math.abs(d))}</b>`);
+         if((r.grossY||0)>0.5||(r.wInc||0)>0.5)out.push(`<span style="font-size:11.5px">💴 額面の年収：${(r.grossY||0)>0.5?`${esc(S.v.myName||"世帯主")} ${fmt(r.grossY)}`:""}${(r.grossY||0)>0.5&&(r.wInc||0)>0.5?"・":""}${(r.wInc||0)>0.5?`${esc(S.v.spName||"配偶者")} ${fmt(r.wInc)}`:""}</span>`);
          const C=r.comp||{},oth=r.spend-(C.liv||0)-(C.kids||0)-(C.edu||0)-(C.send||0)-(C.loan||0)-(C.maint||0);
          out.push(`<span style="font-size:11.5px">🧾 支出の内訳：${KLM?"家族の生活費":"生活費（子どもの分を除く）"} ${fmt(C.liv||0)}${KLM?"":`・子どもの生活費 ${fmt(C.kids||0)}`}・教育費/保育料 ${fmt(C.edu||0)}${C.send>0.5?`・仕送り ${fmt(C.send)}`:""}・ローン ${fmt(C.loan||0)}${C.maint>0.5?`・維持費 ${fmt(C.maint)}`:""}${oth>0.5?`・イベントなど ${fmt(oth)}`:""}</span>`)}
        KO.forEach((k,i)=>{const a=k.age+y,nm=k.name||"子"+(i+1),gy=gradY(k);let g=null;
